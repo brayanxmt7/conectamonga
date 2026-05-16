@@ -1,0 +1,2838 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConectaMonga – A Cidade Conectada</title>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One+SC&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g900: #0a5c36;
+  --g700: #1a8a52;
+  --g500: #2eb872;
+  --g300: #6dd6a4;
+  --g100: #d4f0e2;
+  --g50:  #f0faf5;
+  --white: #ffffff;
+  --bg: #f7faf8;
+  --ink: #0f1f18;
+  --ink2: #2d4a3e;
+  --ink3: #5a7a6e;
+  --ink4: #93b0a3;
+  --border: #e2ede7;
+  --accent: #f4a01c;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --shadow-sm: 0 2px 8px rgba(10,92,54,0.08);
+  --shadow: 0 8px 32px rgba(10,92,54,0.12);
+  --shadow-lg: 0 20px 60px rgba(10,92,54,0.18);
+  --shadow-xl: 0 32px 80px rgba(10,92,54,0.22);
+  --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── UTILITIES ─── */
+.bowlby { font-family: 'Bowlby One SC', cursive; }
+.hidden { display: none !important; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--g50); }
+::-webkit-scrollbar-thumb { background: var(--g300); border-radius: 3px; }
+
+/* ─── NAVBAR ─── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: 72px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(226,237,231,0.6);
+  transition: var(--transition);
+}
+.navbar.scrolled {
+  box-shadow: 0 4px 24px rgba(10,92,54,0.1);
+}
+.nav-inner {
+  max-width: 1240px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 100%;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; text-decoration: none; flex-shrink: 0;
+}
+.logo-mark {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(10,92,54,0.35);
+}
+.logo-mark svg { width: 22px; height: 22px; fill: white; }
+.logo-name {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 1.2rem;
+  color: var(--g900);
+  letter-spacing: 0.01em;
+}
+.logo-name span { color: var(--g500); }
+.nav-links {
+  display: flex; align-items: center; gap: 4px;
+}
+.nav-link {
+  font-size: 0.875rem; font-weight: 500; color: var(--ink3);
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: var(--transition);
+  border: none; background: none; font-family: 'DM Sans', sans-serif;
+}
+.nav-link:hover { color: var(--g900); background: var(--g50); }
+.nav-link.active { color: var(--g700); font-weight: 600; }
+.nav-actions { display: flex; align-items: center; gap: 10px; }
+.btn-ghost-nav {
+  font-size: 0.875rem; font-weight: 600; color: var(--g900);
+  padding: 9px 18px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: white;
+  cursor: pointer; transition: var(--transition); font-family: 'DM Sans', sans-serif;
+}
+.btn-ghost-nav:hover { border-color: var(--g500); box-shadow: var(--shadow-sm); }
+.btn-nav-primary {
+  font-size: 0.875rem; font-weight: 600; color: white;
+  padding: 9px 20px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--g900), var(--g700));
+  border: none; cursor: pointer; transition: var(--transition);
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 4px 14px rgba(10,92,54,0.3);
+}
+.btn-nav-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(10,92,54,0.4); }
+.hamburger {
+  display: none;
+  width: 40px; height: 40px;
+  align-items: center; justify-content: center;
+  border: none; background: none; cursor: pointer;
+  border-radius: var(--radius-sm);
+  flex-direction: column; gap: 5px;
+}
+.hamburger span {
+  display: block; width: 22px; height: 2px;
+  background: var(--ink); border-radius: 2px;
+  transition: var(--transition);
+}
+
+/* ─── MOBILE MENU ─── */
+.mobile-menu {
+  display: none;
+  position: fixed; top: 72px; left: 0; right: 0; bottom: 0;
+  background: white; z-index: 999;
+  padding: 24px; overflow-y: auto;
+}
+.mobile-menu.open { display: block; }
+.mobile-nav-link {
+  display: block; padding: 16px 0; font-size: 1.05rem; font-weight: 500;
+  color: var(--ink2); border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #022617 0%, var(--g900) 40%, var(--g700) 75%, var(--g500) 100%);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-top: 72px;
+}
+.hero-orb1 {
+  position: absolute; width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(46,184,114,0.2) 0%, transparent 70%);
+  border-radius: 50%; top: -200px; right: -150px; pointer-events: none;
+  animation: orbFloat1 8s ease-in-out infinite;
+}
+.hero-orb2 {
+  position: absolute; width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+  border-radius: 50%; bottom: -100px; left: -100px; pointer-events: none;
+  animation: orbFloat2 10s ease-in-out infinite;
+}
+.hero-orb3 {
+  position: absolute; width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(244,160,28,0.12) 0%, transparent 70%);
+  border-radius: 50%; top: 40%; right: 20%; pointer-events: none;
+  animation: orbFloat1 12s ease-in-out infinite reverse;
+}
+@keyframes orbFloat1 { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-30px) scale(1.05)} }
+@keyframes orbFloat2 { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(20px) rotate(5deg)} }
+
+.hero-grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 1240px; margin: 0 auto;
+  display: grid; grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px; align-items: center;
+  padding: 80px 32px 80px;
+  position: relative; z-index: 1;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 14px; border-radius: 100px;
+  color: rgba(255,255,255,0.9); font-size: 0.78rem;
+  font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 28px;
+  animation: fadeInUp 0.8s ease both;
+}
+.hero-badge-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--g300);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.75)} }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeInRight { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.hero h1 {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: clamp(2.6rem, 5vw, 4rem);
+  color: white; line-height: 1.08;
+  letter-spacing: 0.01em;
+  margin-bottom: 24px;
+  animation: fadeInUp 0.8s ease 0.1s both;
+}
+.hero h1 .highlight {
+  color: var(--g300);
+  position: relative;
+}
+.hero-sub {
+  color: rgba(255,255,255,0.78);
+  font-size: 1.1rem; line-height: 1.7;
+  max-width: 480px; margin-bottom: 40px;
+  animation: fadeInUp 0.8s ease 0.2s both;
+}
+.hero-cta {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease 0.3s both;
+}
+.btn-hero-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: white; color: var(--g900);
+  font-size: 0.95rem; font-weight: 700;
+  padding: 15px 28px; border-radius: var(--radius-sm);
+  border: none; cursor: pointer; transition: var(--transition);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,0.28); }
+.btn-hero-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  color: white; font-size: 0.95rem; font-weight: 600;
+  padding: 15px 28px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: var(--transition);
+  font-family: 'DM Sans', sans-serif;
+  backdrop-filter: blur(8px);
+}
+.btn-hero-secondary:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+
+/* Hero right side - floating cards */
+.hero-visual {
+  display: flex; flex-direction: column; gap: 16px;
+  animation: fadeInRight 0.9s ease 0.4s both;
+}
+.float-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--radius);
+  padding: 20px 24px; color: white;
+  transition: var(--transition);
+}
+.float-card:hover { background: rgba(255,255,255,0.16); transform: translateX(-4px); }
+.float-card-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.65; margin-bottom: 6px; }
+.float-card-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+.float-card-meta { display: flex; gap: 16px; font-size: 0.8rem; opacity: 0.75; }
+.live-dot {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(46,184,114,0.2); border: 1px solid rgba(46,184,114,0.4);
+  padding: 3px 10px; border-radius: 100px; font-size: 0.72rem;
+  color: var(--g300); font-weight: 600;
+}
+.live-indicator { width: 6px; height: 6px; border-radius: 50%; background: var(--g300); animation: pulse 1.5s infinite; }
+.float-card-interested { font-size: 0.82rem; margin-top: 8px; opacity: 0.8; }
+.float-card-interested b { color: var(--g300); }
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+}
+.stats-inner {
+  max-width: 1240px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: 0 32px;
+}
+.stat-item {
+  padding: 32px 24px;
+  border-right: 1px solid var(--border);
+  transition: var(--transition);
+}
+.stat-item:last-child { border-right: none; }
+.stat-item:hover { background: var(--g50); }
+.stat-num {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 2rem; color: var(--g900); line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-lbl { font-size: 0.85rem; color: var(--ink3); font-weight: 500; }
+
+/* ─── SECTION HEADINGS ─── */
+.section {
+  max-width: 1240px; margin: 0 auto;
+  padding: 80px 32px;
+}
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--g700);
+  margin-bottom: 12px;
+}
+.section-eyebrow::before {
+  content: ''; width: 20px; height: 2px;
+  background: var(--g500); border-radius: 1px;
+}
+.section-title {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  color: var(--ink); line-height: 1.15; margin-bottom: 16px;
+}
+.section-title span { color: var(--g500); }
+.section-sub { color: var(--ink3); font-size: 1rem; line-height: 1.7; max-width: 560px; }
+.section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 40px; gap: 20px; flex-wrap: wrap; }
+.btn-see-all {
+  font-size: 0.875rem; font-weight: 600; color: var(--g700);
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: white;
+  cursor: pointer; transition: var(--transition); white-space: nowrap;
+  font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px;
+}
+.btn-see-all:hover { border-color: var(--g500); color: var(--g900); box-shadow: var(--shadow-sm); }
+
+/* ─── FILTER CHIPS ─── */
+.filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 36px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.85rem; font-weight: 500;
+  padding: 8px 18px; border-radius: 100px;
+  border: 1.5px solid var(--border); background: white;
+  color: var(--ink3); cursor: pointer; transition: var(--transition);
+  font-family: 'DM Sans', sans-serif;
+}
+.chip:hover { border-color: var(--g500); color: var(--g700); }
+.chip.active { background: var(--g900); color: white; border-color: var(--g900); }
+
+/* ─── EVENT CARDS ─── */
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+.event-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+}
+.event-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: transparent;
+}
+.event-img {
+  height: 196px;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+  position: relative; overflow: hidden;
+}
+.event-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,30,20,0.7) 0%, transparent 60%);
+}
+.event-cat-badge {
+  position: absolute; top: 14px; left: 14px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 100px;
+  background: white; color: var(--g900);
+}
+.event-fav-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,0.9); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); backdrop-filter: blur(8px);
+}
+.event-fav-btn:hover { background: white; transform: scale(1.1); }
+.event-fav-btn svg { width: 16px; height: 16px; }
+.event-date-chip {
+  position: absolute; bottom: 12px; left: 14px;
+  background: white; border-radius: var(--radius-sm);
+  padding: 6px 12px; font-size: 0.78rem; font-weight: 700; color: var(--g900);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.event-body { padding: 20px 22px 16px; }
+.event-title {
+  font-weight: 700; font-size: 1.05rem; color: var(--ink);
+  margin-bottom: 8px; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.event-desc {
+  font-size: 0.84rem; color: var(--ink3); line-height: 1.6; margin-bottom: 14px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.event-info { display: flex; flex-direction: column; gap: 5px; }
+.event-info-row {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 0.82rem; color: var(--ink3);
+}
+.event-info-row svg { width: 14px; height: 14px; color: var(--g700); flex-shrink: 0; }
+.event-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.event-company { font-size: 0.8rem; font-weight: 600; color: var(--ink2); }
+.event-company small { display: block; font-weight: 400; color: var(--ink4); font-size: 0.73rem; }
+.btn-ver-mais {
+  font-size: 0.8rem; font-weight: 700; color: var(--g700);
+  padding: 7px 16px; border: 1.5px solid var(--g100);
+  border-radius: var(--radius-sm); cursor: pointer; background: none;
+  transition: var(--transition); font-family: 'DM Sans', sans-serif;
+}
+.btn-ver-mais:hover { background: var(--g900); color: white; border-color: var(--g900); }
+
+/* Featured card */
+.event-card.featured { grid-column: span 2; }
+.event-card.featured .event-img { height: 260px; }
+
+/* ─── CATEGORIES GRID ─── */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+.cat-card {
+  background: white; border-radius: var(--radius);
+  padding: 28px 20px; text-align: center;
+  border: 1px solid var(--border);
+  cursor: pointer; transition: var(--transition);
+}
+.cat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: transparent; }
+.cat-icon {
+  width: 56px; height: 56px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; margin: 0 auto 14px;
+}
+.cat-name { font-weight: 700; font-size: 0.9rem; color: var(--ink2); margin-bottom: 4px; }
+.cat-count { font-size: 0.78rem; color: var(--ink4); }
+.cat-card.c-verde .cat-icon { background: var(--g100); }
+.cat-card.c-laranja .cat-icon { background: #fde8d4; }
+.cat-card.c-roxo .cat-icon { background: #f0d4fd; }
+.cat-card.c-azul .cat-icon { background: #d4e4fd; }
+.cat-card.c-rosa .cat-icon { background: #fdd4e8; }
+.cat-card.c-amarelo .cat-icon { background: #fdf5d4; }
+
+/* ─── COMPANIES ─── */
+.companies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.company-card {
+  background: white; border-radius: var(--radius-lg);
+  border: 1px solid var(--border); overflow: hidden;
+  transition: var(--transition); cursor: pointer;
+}
+.company-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: transparent; }
+.company-banner {
+  height: 80px;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+  position: relative;
+}
+.company-logo {
+  width: 56px; height: 56px; border-radius: 14px;
+  background: white; border: 3px solid white;
+  position: absolute; bottom: -24px; left: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 800; color: var(--g900);
+}
+.company-body { padding: 36px 20px 20px; }
+.company-name { font-weight: 700; font-size: 1rem; color: var(--ink); margin-bottom: 4px; }
+.company-cat { font-size: 0.78rem; color: var(--g700); font-weight: 600; margin-bottom: 10px; }
+.company-desc { font-size: 0.83rem; color: var(--ink3); line-height: 1.6; margin-bottom: 14px; }
+.company-rating { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; margin-bottom: 16px; }
+.stars { color: #f4a01c; }
+.rating-val { font-weight: 700; color: var(--ink); }
+.rating-count { color: var(--ink4); font-size: 0.78rem; }
+.company-footer {
+  display: flex; gap: 8px;
+  border-top: 1px solid var(--border); padding-top: 16px;
+}
+.btn-wpp {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.8rem; font-weight: 600; color: #128c7e;
+  padding: 8px 14px; border: 1.5px solid #25d366;
+  border-radius: var(--radius-sm); background: none;
+  cursor: pointer; transition: var(--transition); text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-wpp:hover { background: #25d366; color: white; box-shadow: 0 4px 14px rgba(37,211,102,0.3); }
+.btn-perfil {
+  font-size: 0.8rem; font-weight: 600; color: var(--g900);
+  padding: 8px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); background: none;
+  cursor: pointer; transition: var(--transition);
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-perfil:hover { background: var(--g50); border-color: var(--g300); }
+
+/* ─── TESTIMONIALS ─── */
+.testimonials-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+}
+.testimonial-card {
+  background: white; border-radius: var(--radius-lg); padding: 28px;
+  border: 1px solid var(--border); transition: var(--transition);
+}
+.testimonial-card:hover { box-shadow: var(--shadow); border-color: transparent; }
+.testimonial-stars { color: #f4a01c; font-size: 0.9rem; margin-bottom: 12px; }
+.testimonial-text { font-size: 0.92rem; color: var(--ink2); line-height: 1.7; margin-bottom: 18px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.testimonial-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.9rem; color: white;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+}
+.testimonial-name { font-weight: 700; font-size: 0.9rem; color: var(--ink); }
+.testimonial-role { font-size: 0.78rem; color: var(--ink4); }
+
+/* ─── CTA BANNER ─── */
+.cta-section {
+  background: linear-gradient(135deg, var(--g900) 0%, var(--g700) 60%, var(--g500) 100%);
+  border-radius: var(--radius-xl);
+  padding: 60px 56px;
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: center; gap: 40px;
+  position: relative; overflow: hidden;
+  margin: 0 32px 80px;
+  max-width: calc(1240px - 64px);
+  margin-left: auto; margin-right: auto;
+}
+.cta-section::before {
+  content: ''; position: absolute; right: -60px; top: -60px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.cta-eyebrow {
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--g300);
+  margin-bottom: 12px;
+}
+.cta-title {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: white; margin-bottom: 14px; line-height: 1.15;
+}
+.cta-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; line-height: 1.6; max-width: 460px; }
+.cta-btns { display: flex; gap: 12px; flex-shrink: 0; flex-wrap: wrap; align-items: flex-start; }
+
+/* ─── AUTH PAGES ─── */
+.auth-page {
+  min-height: 100vh; padding-top: 72px;
+  background: var(--g50);
+  display: flex; align-items: center; justify-content: center;
+  padding: 100px 20px 60px;
+}
+.auth-wrap { width: 100%; max-width: 480px; }
+.auth-card {
+  background: white; border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl); overflow: hidden;
+  border: 1px solid var(--border);
+}
+.auth-top {
+  background: linear-gradient(135deg, #022617, var(--g900), var(--g700));
+  padding: 40px 44px 36px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.auth-top::after {
+  content: ''; position: absolute; right: -40px; bottom: -40px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.auth-icon {
+  width: 60px; height: 60px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px;
+}
+.auth-icon svg { width: 28px; height: 28px; fill: white; }
+.auth-top h2 {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 1.6rem; color: white; margin-bottom: 6px; line-height: 1.2;
+}
+.auth-top p { color: rgba(255,255,255,0.72); font-size: 0.875rem; }
+.auth-body { padding: 40px 44px 44px; }
+
+.form-group { margin-bottom: 20px; }
+.form-label {
+  display: block; font-size: 0.82rem; font-weight: 600;
+  color: var(--ink2); margin-bottom: 8px; letter-spacing: 0.02em;
+}
+.form-label .req { color: #e53e3e; margin-left: 2px; }
+.form-input {
+  width: 100%; padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem; color: var(--ink); background: var(--bg);
+  transition: var(--transition); outline: none;
+}
+.form-input:focus { border-color: var(--g700); box-shadow: 0 0 0 3px rgba(26,138,82,0.12); background: white; }
+.form-input::placeholder { color: var(--ink4); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-hint { font-size: 0.76rem; color: var(--ink4); margin-top: 5px; }
+.form-textarea {
+  width: 100%; padding: 12px 16px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--ink); background: var(--bg);
+  transition: var(--transition); outline: none; resize: vertical; min-height: 110px;
+}
+.form-textarea:focus { border-color: var(--g700); box-shadow: 0 0 0 3px rgba(26,138,82,0.12); background: white; }
+
+.btn-submit {
+  width: 100%; background: linear-gradient(135deg, var(--g900), var(--g700));
+  color: white; font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem; font-weight: 700; padding: 14px;
+  border-radius: var(--radius-sm); cursor: pointer; border: none;
+  transition: var(--transition); margin-top: 8px;
+  box-shadow: 0 4px 16px rgba(10,92,54,0.3);
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(10,92,54,0.4); }
+
+.social-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+  background: white; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+  color: var(--ink2); cursor: pointer; transition: var(--transition); margin-bottom: 10px;
+}
+.social-btn:hover { background: var(--bg); border-color: var(--ink4); }
+.social-btn img { width: 20px; height: 20px; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.divider::before,.divider::after { content:''; flex: 1; height: 1px; background: var(--border); }
+.divider span { font-size: 0.78rem; color: var(--ink4); }
+.auth-footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--ink3); }
+.auth-footer-link a { color: var(--g700); font-weight: 700; cursor: pointer; text-decoration: none; }
+.auth-footer-link a:hover { text-decoration: underline; }
+.remember-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 0.84rem; color: var(--ink3); cursor: pointer; }
+.link-small { font-size: 0.84rem; color: var(--g700); font-weight: 600; cursor: pointer; text-decoration: none; }
+.link-small:hover { text-decoration: underline; }
+.info-box {
+  background: var(--g50); border: 1px solid var(--g100);
+  border-radius: var(--radius-sm); padding: 12px 16px;
+  font-size: 0.82rem; color: var(--g900); margin-bottom: 22px;
+  display: flex; gap: 10px;
+}
+.info-box svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: var(--g700); }
+
+/* ─── PUBLICAR EVENTO ─── */
+.publish-page {
+  padding-top: 72px; min-height: 100vh; background: var(--bg);
+}
+.publish-inner { max-width: 900px; margin: 0 auto; padding: 60px 32px; }
+.publish-header { margin-bottom: 36px; }
+.publish-title {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 2rem; color: var(--ink); margin-bottom: 8px;
+}
+.publish-sub { color: var(--ink3); font-size: 0.95rem; }
+.form-card {
+  background: white; border-radius: var(--radius-lg);
+  padding: 40px; box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.form-card-title {
+  font-weight: 700; font-size: 1rem; color: var(--ink);
+  margin-bottom: 24px; display: flex; align-items: center; gap: 8px;
+}
+.form-card-title::before {
+  content: ''; width: 4px; height: 18px;
+  background: var(--g500); border-radius: 2px;
+}
+.upload-zone {
+  border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 48px 24px; text-align: center; cursor: pointer;
+  transition: var(--transition); color: var(--ink3);
+}
+.upload-zone:hover { border-color: var(--g500); background: var(--g50); color: var(--g700); }
+.upload-icon { font-size: 2rem; margin-bottom: 12px; }
+.upload-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+.upload-hint { font-size: 0.8rem; }
+.cat-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat-pill {
+  font-size: 0.83rem; font-weight: 500;
+  padding: 7px 16px; border-radius: 100px;
+  border: 1.5px solid var(--border); background: white;
+  color: var(--ink3); cursor: pointer; transition: var(--transition);
+  font-family: 'DM Sans', sans-serif;
+}
+.cat-pill.selected { background: var(--g900); color: white; border-color: var(--g900); }
+.cat-pill:hover:not(.selected) { border-color: var(--g500); color: var(--g700); }
+
+/* Preview card */
+.preview-card {
+  background: var(--g50); border: 1.5px dashed var(--g300);
+  border-radius: var(--radius-lg); padding: 24px; margin-top: 24px;
+}
+.preview-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--g700); margin-bottom: 16px; }
+.preview-mini {
+  background: white; border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--border); max-width: 340px;
+}
+.preview-mini-img {
+  height: 130px;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+}
+.preview-mini-body { padding: 14px 16px; }
+.preview-mini-title { font-weight: 700; font-size: 0.9rem; color: var(--ink); margin-bottom: 6px; }
+.preview-mini-meta { font-size: 0.78rem; color: var(--ink3); }
+
+/* ─── DETALHES DO EVENTO ─── */
+.event-detail-page { padding-top: 72px; }
+.event-detail-banner {
+  height: 420px;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+  position: relative; overflow: hidden;
+}
+.event-detail-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(5,20,14,0.85) 0%, rgba(5,20,14,0.3) 60%, transparent 100%);
+}
+.event-detail-info {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 0 32px 40px; max-width: 1240px; margin: 0 auto;
+}
+.event-detail-cat {
+  display: inline-block; font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 4px 14px; border-radius: 100px;
+  background: var(--g500); color: white; margin-bottom: 12px;
+}
+.event-detail-title {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: white; line-height: 1.1; margin-bottom: 16px;
+}
+.event-detail-meta { display: flex; flex-wrap: wrap; gap: 20px; }
+.event-detail-meta-item {
+  display: flex; align-items: center; gap: 7px;
+  color: rgba(255,255,255,0.85); font-size: 0.9rem;
+}
+.event-detail-meta-item svg { width: 16px; height: 16px; }
+.event-detail-body {
+  max-width: 1240px; margin: 0 auto; padding: 48px 32px;
+  display: grid; grid-template-columns: 1fr 340px; gap: 40px;
+}
+.event-detail-main {}
+.event-detail-sidebar {}
+.detail-section-title {
+  font-weight: 700; font-size: 1.05rem; color: var(--ink);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.detail-section-title::before { content:''; width:4px; height:18px; background: var(--g500); border-radius:2px; }
+.event-detail-desc { font-size: 0.92rem; color: var(--ink3); line-height: 1.8; margin-bottom: 32px; }
+.map-placeholder {
+  height: 240px; border-radius: var(--radius); overflow: hidden;
+  background: var(--g50); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 10px; color: var(--ink3);
+  font-size: 0.9rem; margin-bottom: 32px;
+}
+.map-placeholder svg { width: 36px; height: 36px; color: var(--g500); }
+.countdown-box {
+  background: linear-gradient(135deg, var(--g900), var(--g700));
+  border-radius: var(--radius); padding: 24px;
+  color: white; margin-bottom: 20px;
+}
+.countdown-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.75; margin-bottom: 14px; }
+.countdown-nums { display: flex; gap: 12px; }
+.countdown-unit { text-align: center; flex: 1; }
+.countdown-num {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 1.8rem; line-height: 1;
+}
+.countdown-unit-lbl { font-size: 0.68rem; opacity: 0.65; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+.sidebar-card {
+  background: white; border-radius: var(--radius); padding: 24px;
+  border: 1px solid var(--border); margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.interested-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--ink3); margin-bottom: 16px; }
+.interested-row b { color: var(--ink); font-size: 0.95rem; }
+.btn-primary-full {
+  width: 100%; background: linear-gradient(135deg, var(--g900), var(--g700));
+  color: white; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 700;
+  padding: 13px; border-radius: var(--radius-sm); cursor: pointer; border: none;
+  transition: var(--transition); margin-bottom: 10px;
+  box-shadow: 0 4px 14px rgba(10,92,54,0.3);
+}
+.btn-primary-full:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10,92,54,0.4); }
+.btn-outline-full {
+  width: 100%; background: none;
+  color: var(--g900); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600;
+  padding: 12px; border-radius: var(--radius-sm); cursor: pointer;
+  border: 1.5px solid var(--border); transition: var(--transition); margin-bottom: 10px;
+}
+.btn-outline-full:hover { border-color: var(--g500); background: var(--g50); }
+
+/* ─── PERFIL USUARIO ─── */
+.profile-page { padding-top: 72px; }
+.profile-banner {
+  height: 200px;
+  background: linear-gradient(135deg, #022617, var(--g900), var(--g700));
+  position: relative;
+}
+.profile-content { max-width: 1240px; margin: 0 auto; padding: 0 32px 80px; }
+.profile-top {
+  display: flex; align-items: flex-end; gap: 24px;
+  margin-top: -50px; margin-bottom: 40px;
+}
+.profile-avatar {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+  border: 4px solid white; box-shadow: var(--shadow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; color: white; font-weight: 800;
+  flex-shrink: 0;
+}
+.profile-info { padding-bottom: 8px; }
+.profile-name { font-family: 'Bowlby One SC', cursive; font-size: 1.6rem; color: var(--ink); }
+.profile-sub { font-size: 0.88rem; color: var(--ink3); margin-top: 4px; }
+.profile-grid { display: grid; grid-template-columns: 280px 1fr; gap: 28px; }
+.profile-sidebar .sidebar-card {}
+.profile-stat-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+.profile-stat-row:last-child { border-bottom: none; }
+.profile-stat-row .key { color: var(--ink3); }
+.profile-stat-row .val { font-weight: 700; color: var(--ink); }
+.dashboard-tabs {
+  display: flex; gap: 4px; border-bottom: 1.5px solid var(--border);
+  margin-bottom: 32px;
+}
+.dash-tab {
+  font-size: 0.875rem; font-weight: 600; padding: 12px 18px;
+  border-bottom: 2.5px solid transparent; margin-bottom: -1.5px;
+  cursor: pointer; color: var(--ink3); transition: var(--transition);
+}
+.dash-tab.active { color: var(--g900); border-bottom-color: var(--g900); }
+.dash-tab:hover:not(.active) { color: var(--ink); }
+
+/* ─── SOBRE NÓS ─── */
+.sobre-page { padding-top: 72px; }
+.sobre-hero {
+  background: linear-gradient(160deg, #022617, var(--g900), var(--g700) 70%, var(--g500));
+  padding: 100px 32px 100px; text-align: center; position: relative; overflow: hidden;
+}
+.sobre-hero-inner { max-width: 720px; margin: 0 auto; position: relative; z-index: 1; }
+.sobre-hero h1 {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: clamp(2rem, 4vw, 3rem); color: white; line-height: 1.1;
+  margin-bottom: 20px;
+}
+.sobre-hero h1 span { color: var(--g300); }
+.sobre-hero p { color: rgba(255,255,255,0.78); font-size: 1.05rem; line-height: 1.7; }
+.sobre-content { max-width: 940px; margin: 0 auto; padding: 72px 32px 80px; }
+.values-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-top: 40px; }
+.value-card {
+  background: white; border-radius: var(--radius); padding: 28px;
+  border: 1px solid var(--border); transition: var(--transition);
+}
+.value-card:hover { box-shadow: var(--shadow); border-color: transparent; transform: translateY(-3px); }
+.value-icon {
+  width: 52px; height: 52px; border-radius: var(--radius-sm);
+  background: var(--g100); display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; margin-bottom: 16px;
+}
+.value-title { font-weight: 700; font-size: 1rem; color: var(--ink); margin-bottom: 8px; }
+.value-desc { font-size: 0.85rem; color: var(--ink3); line-height: 1.6; }
+
+/* ─── FAVORITOS ─── */
+.fav-page { padding-top: 72px; min-height: 100vh; background: var(--bg); }
+.fav-inner { max-width: 1240px; margin: 0 auto; padding: 60px 32px; }
+.page-title {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 2rem; color: var(--ink); margin-bottom: 8px;
+}
+.page-sub { color: var(--ink3); margin-bottom: 40px; }
+
+/* ─── FEEDBACKS ─── */
+.feedback-page { padding-top: 72px; min-height: 100vh; background: var(--bg); }
+.feedback-inner { max-width: 860px; margin: 0 auto; padding: 60px 32px; }
+.feedback-form-card {
+  background: white; border-radius: var(--radius-lg); padding: 36px;
+  border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 32px;
+}
+.star-selector { display: flex; gap: 8px; margin-bottom: 4px; }
+.star-btn {
+  font-size: 1.8rem; cursor: pointer; transition: var(--transition);
+  background: none; border: none; padding: 2px; line-height: 1;
+  opacity: 0.3;
+}
+.star-btn.active, .star-btn:hover { opacity: 1; }
+.feedback-list { display: flex; flex-direction: column; gap: 16px; }
+.feedback-item {
+  background: white; border-radius: var(--radius); padding: 24px;
+  border: 1px solid var(--border);
+}
+.feedback-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.feedback-author { display: flex; align-items: center; gap: 10px; }
+.feedback-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--g700), var(--g500));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700; color: white;
+}
+.feedback-name { font-weight: 700; font-size: 0.88rem; color: var(--ink); }
+.feedback-date { font-size: 0.75rem; color: var(--ink4); }
+.feedback-stars { font-size: 0.85rem; color: #f4a01c; }
+.feedback-text { font-size: 0.88rem; color: var(--ink3); line-height: 1.7; }
+
+/* ─── PERFIL EMPRESA ─── */
+.empresa-page { padding-top: 72px; }
+.empresa-banner {
+  height: 220px;
+  background: linear-gradient(135deg, var(--g900), var(--g500));
+  position: relative; overflow: hidden;
+}
+.empresa-banner-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(5,20,14,0.35) 0%, rgba(5,20,14,0.55) 100%);
+}
+.empresa-content { max-width: 1240px; margin: 0 auto; padding: 0 32px 80px; }
+.empresa-header {
+  display: flex; align-items: flex-end; gap: 24px;
+  margin-top: -52px; margin-bottom: 40px; flex-wrap: wrap;
+  position: relative; z-index: 2;
+}
+.empresa-logo {
+  width: 96px; height: 96px; border-radius: var(--radius);
+  background: white; border: 4px solid white;
+  box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; flex-shrink: 0;
+}
+.empresa-info { padding-bottom: 8px; }
+.empresa-name { font-family: 'Bowlby One SC', cursive; font-size: 1.7rem; color: var(--ink); }
+.empresa-cat-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--g100); color: var(--g900); font-size: 0.78rem; font-weight: 700;
+  padding: 4px 12px; border-radius: 100px; margin-top: 6px;
+}
+.empresa-grid { display: grid; grid-template-columns: 1fr 320px; gap: 32px; }
+.empresa-details-card {
+  background: white; border-radius: var(--radius); padding: 24px;
+  border: 1px solid var(--border); margin-bottom: 16px;
+}
+.empresa-detail-row {
+  display: flex; gap: 14px; padding: 12px 0;
+  border-bottom: 1px solid var(--border); align-items: flex-start;
+}
+.empresa-detail-row:last-child { border-bottom: none; }
+.empresa-detail-icon { color: var(--g700); margin-top: 2px; flex-shrink: 0; }
+.empresa-detail-icon svg { width: 16px; height: 16px; }
+.empresa-detail-label { font-size: 0.75rem; color: var(--ink4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.empresa-detail-val { font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--ink);
+  color: rgba(255,255,255,0.7);
+}
+.footer-inner {
+  max-width: 1240px; margin: 0 auto; padding: 64px 32px 40px;
+  display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 48px;
+}
+.footer-brand-name {
+  font-family: 'Bowlby One SC', cursive;
+  font-size: 1.3rem; color: white; margin-bottom: 12px;
+}
+.footer-brand-name span { color: var(--g300); }
+.footer-brand-desc { font-size: 0.85rem; line-height: 1.7; margin-bottom: 20px; }
+.footer-social { display: flex; gap: 10px; }
+.social-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--transition); color: rgba(255,255,255,0.7); font-size: 0.85rem;
+}
+.social-icon:hover { background: var(--g700); border-color: var(--g700); color: white; }
+.footer-col-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: white; margin-bottom: 20px; }
+.footer-link {
+  display: block; font-size: 0.87rem; color: rgba(255,255,255,0.6);
+  margin-bottom: 12px; cursor: pointer; transition: var(--transition);
+  text-decoration: none;
+}
+.footer-link:hover { color: white; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 24px 32px; max-width: 1240px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.82rem; color: rgba(255,255,255,0.4);
+}
+.footer-bottom span { color: var(--g300); }
+
+/* ─── BOTTOM NAV (MOBILE) ─── */
+.bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+}
+.bottom-nav-inner {
+  display: flex; align-items: center; justify-content: space-around;
+}
+.bottom-nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 12px; cursor: pointer; transition: var(--transition);
+  font-size: 0.65rem; font-weight: 600; color: var(--ink4); border: none; background: none;
+}
+.bottom-nav-item.active { color: var(--g900); }
+.bottom-nav-item svg { width: 22px; height: 22px; }
+.bottom-nav-item.active svg { color: var(--g900); }
+
+/* ─── CAROUSEL ─── */
+.carousel-wrap { position: relative; }
+.carousel-track-outer { overflow: hidden; }
+.carousel-track {
+  display: flex; gap: 24px;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.carousel-track .event-card { min-width: 320px; flex-shrink: 0; }
+.carousel-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: white; border: 1.5px solid var(--border);
+  box-shadow: var(--shadow); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); z-index: 2;
+}
+.carousel-btn:hover { background: var(--g50); box-shadow: var(--shadow-lg); transform: translateY(-50%) scale(1.05); }
+.carousel-btn.prev { left: -20px; }
+.carousel-btn.next { right: -20px; }
+.carousel-btn svg { width: 18px; height: 18px; }
+
+/* ─── SCROLL REVEAL ─── */
+.reveal {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .hero-inner { gap: 40px; }
+  .event-detail-body { grid-template-columns: 1fr; }
+  .event-detail-sidebar { order: -1; }
+  .profile-grid { grid-template-columns: 1fr; }
+  .empresa-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-actions { display: none; }
+  .hamburger { display: flex; }
+  .hero-inner { grid-template-columns: 1fr; padding: 60px 24px; }
+  .hero-visual { display: none; }
+  .hero h1 { font-size: 2.4rem; }
+  .stats-inner { grid-template-columns: 1fr 1fr; }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .stat-item:nth-child(odd) { border-right: 1px solid var(--border); }
+  .section { padding: 56px 24px; }
+  .cta-section { grid-template-columns: 1fr; padding: 40px 32px; margin: 0 24px 60px; }
+  .auth-body { padding: 28px 28px 32px; }
+  .auth-top { padding: 32px 28px 28px; }
+  .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .bottom-nav { display: block; }
+  .event-detail-banner { height: 300px; }
+  .event-detail-body { padding: 32px 24px; }
+  .event-card.featured { grid-column: span 1; }
+  .form-row { grid-template-columns: 1fr; }
+  .profile-top { flex-direction: column; align-items: flex-start; margin-top: -60px; }
+}
+/* ─── MODAL OAUTH ─── */
+.oauth-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(10,20,15,0.6);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.oauth-overlay.open { opacity: 1; pointer-events: all; }
+.oauth-modal {
+  background: white; border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%; max-width: 400px; margin: 20px;
+  overflow: hidden;
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.oauth-overlay.open .oauth-modal { transform: translateY(0) scale(1); }
+.oauth-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 14px;
+}
+.oauth-provider-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.oauth-header-text { flex: 1; }
+.oauth-header-title { font-weight: 700; font-size: 0.95rem; color: var(--ink); }
+.oauth-header-sub { font-size: 0.78rem; color: var(--ink4); margin-top: 2px; }
+.oauth-body { padding: 24px 28px 28px; }
+.oauth-account {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border: 1.5px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  transition: var(--transition); margin-bottom: 10px;
+}
+.oauth-account:hover { border-color: var(--g500); background: var(--g50); }
+.oauth-account.selected { border-color: var(--g700); background: var(--g50); }
+.oauth-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.9rem; color: white; flex-shrink: 0;
+}
+.oauth-account-name { font-weight: 600; font-size: 0.88rem; color: var(--ink); }
+.oauth-account-email { font-size: 0.75rem; color: var(--ink4); margin-top: 1px; }
+.oauth-check {
+  margin-left: auto; width: 20px; height: 20px;
+  border-radius: 50%; border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); flex-shrink: 0;
+}
+.oauth-account.selected .oauth-check {
+  background: var(--g700); border-color: var(--g700);
+}
+.oauth-account.selected .oauth-check::after {
+  content: ''; width: 5px; height: 9px;
+  border: 2px solid white; border-top: none; border-left: none;
+  transform: rotate(45deg) translateY(-1px);
+}
+.oauth-divider { font-size: 0.78rem; color: var(--ink4); text-align: center; margin: 14px 0; }
+.oauth-new-account {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-radius: var(--radius-sm);
+  font-size: 0.85rem; font-weight: 600; color: var(--g700);
+  cursor: pointer; transition: var(--transition);
+}
+.oauth-new-account:hover { background: var(--g50); }
+.oauth-footer {
+  padding: 16px 28px 24px;
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+.oauth-btn-cancel {
+  padding: 10px 20px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: white;
+  font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+  font-weight: 600; color: var(--ink3); cursor: pointer;
+  transition: var(--transition);
+}
+.oauth-btn-cancel:hover { border-color: var(--ink4); color: var(--ink); }
+.oauth-btn-confirm {
+  padding: 10px 24px; border-radius: var(--radius-sm);
+  border: none; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+  font-weight: 700; color: white; cursor: pointer;
+  transition: var(--transition); min-width: 100px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.oauth-btn-confirm:disabled { opacity: 0.7; cursor: not-allowed; }
+
+/* spinner */
+.oauth-spinner {
+  width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white; border-radius: 50%;
+  animation: spin 0.7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+  .footer-inner { grid-template-columns: 1fr; }
+  .events-grid { grid-template-columns: 1fr; }
+  .categories-grid { grid-template-columns: repeat(3, 1fr); }
+  .companies-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .values-grid { grid-template-columns: 1fr; }
+  .stats-inner { grid-template-columns: 1fr 1fr; }
+  .hero h1 { font-size: 2rem; }
+  .publish-inner, .fav-inner, .feedback-inner { padding: 40px 20px; }
+  .form-card { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a class="logo" onclick="showPage('home')">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      </div>
+      <span class="logo-name">Conecta<span>Monga</span></span>
+    </a>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('home')">Início</button>
+      <button class="nav-link" onclick="showPage('eventos')">Eventos</button>
+      <button class="nav-link" onclick="showPage('sobre')">Sobre</button>
+    </div>
+    <div class="nav-actions" id="navActions">
+      <button class="btn-ghost-nav" onclick="showPage('login-user')">Entrar</button>
+      <button class="btn-nav-primary" onclick="showPage('cadastro-empresa')">Cadastrar Empresa</button>
+    </div>
+    <div class="nav-actions hidden" id="navActionsLogado">
+      <span style="font-size:0.85rem;font-weight:600;color:var(--ink2)" id="navNomeUsuario"></span>
+      <button class="btn-nav-primary" onclick="requireLogin('publicar')">+ Publicar Evento</button>
+      <button class="btn-ghost-nav" onclick="fazerLogout()">Sair</button>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a class="mobile-nav-link" onclick="showPage('home');toggleMobile()">🏠 Início</a>
+  <a class="mobile-nav-link" onclick="showPage('eventos');toggleMobile()">🎉 Eventos</a>
+  <a class="mobile-nav-link" onclick="showPage('sobre');toggleMobile()">ℹ️ Sobre Nós</a>
+  <a class="mobile-nav-link" onclick="requireLogin('favoritos');toggleMobile()">❤️ Favoritos</a>
+  <a class="mobile-nav-link" onclick="requireLogin('feedbacks');toggleMobile()">⭐ Feedbacks</a>
+  <div id="mobileGuestLinks">
+    <a class="mobile-nav-link" onclick="showPage('login-user');toggleMobile()">👤 Login Usuário</a>
+    <a class="mobile-nav-link" onclick="showPage('login-empresa');toggleMobile()">🏢 Login Empresa</a>
+    <a class="mobile-nav-link" onclick="showPage('cadastro-empresa');toggleMobile()">➕ Cadastrar Empresa</a>
+  </div>
+  <div id="mobileUserLinks" style="display:none">
+    <a class="mobile-nav-link" onclick="showPage('perfil-user');toggleMobile()">👤 Meu Perfil</a>
+    <a class="mobile-nav-link" onclick="fazerLogout();toggleMobile()">🚪 Sair</a>
+  </div>
+  <div style="margin-top:24px">
+    <button class="btn-submit" onclick="requireLogin('publicar');toggleMobile()">+ Publicar Evento</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: HOME -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-orb1"></div>
+    <div class="hero-orb2"></div>
+    <div class="hero-orb3"></div>
+    <div class="hero-grid-overlay"></div>
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Mongaguá está acontecendo agora
+        </div>
+        <h1>A cidade<br><span class="highlight">conectada</span><br>com seus eventos</h1>
+        <p class="hero-sub">Descubra shows, feiras, gastronomia, esportes e muito mais acontecendo em Mongaguá. Tudo em um só lugar.</p>
+        <div class="hero-cta">
+          <button class="btn-hero-primary" onclick="showPage('eventos')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            Explorar Eventos
+          </button>
+          <button class="btn-hero-secondary" onclick="showPage('cadastro-empresa')">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Cadastrar Empresa
+          </button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="float-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="float-card-label">🔴 Ao vivo</div>
+            <span class="live-dot"><span class="live-indicator"></span>Acontecendo</span>
+          </div>
+          <div class="float-card-title">Festival Gastronômico Monga</div>
+          <div class="float-card-meta">
+            <span>📍 Praça Central</span>
+            <span>🕐 Até 23h</span>
+          </div>
+          <div class="float-card-interested"><b>342</b> pessoas interessadas</div>
+        </div>
+        <div class="float-card">
+          <div class="float-card-label">Próximo Evento</div>
+          <div class="float-card-title">🎵 Show de Forró — Verão 2025</div>
+          <div class="float-card-meta">
+            <span>📅 Sáb, 22 Jun</span>
+            <span>🎟️ Gratuito</span>
+          </div>
+          <div class="float-card-interested"><b>1.2k</b> confirmados</div>
+        </div>
+        <div class="float-card">
+          <div class="float-card-label">Novidade</div>
+          <div class="float-card-title">🏄 Torneio de Surf Mongaguá</div>
+          <div class="float-card-meta">
+            <span>📅 Jul 5-7</span>
+            <span>🌊 Praia Central</span>
+          </div>
+          <div class="float-card-interested"><b>89</b> inscritos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <div class="stat-num" data-target="147">0</div>
+        <div class="stat-lbl">Eventos ativos</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-num" data-target="38">0</div>
+        <div class="stat-lbl">Empresas cadastradas</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-num" data-target="12400">0</div>
+        <div class="stat-lbl">Usuários na plataforma</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-num" data-target="4.8">0</div>
+        <div class="stat-lbl">Nota média dos eventos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENTOS EM DESTAQUE -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow reveal">Em destaque</div>
+        <h2 class="section-title reveal">Eventos <span>imperdíveis</span></h2>
+      </div>
+      <button class="btn-see-all" onclick="showPage('eventos')">Ver todos →</button>
+    </div>
+    <div class="carousel-wrap reveal">
+      <div class="carousel-track-outer">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="event-card" onclick="showPage('detalhe')">
+            <div class="event-img" style="background:linear-gradient(135deg,#0a5c36,#2eb872)">
+              <div class="event-img-overlay"></div>
+              <span class="event-cat-badge">Gastronomia</span>
+              <button class="event-fav-btn" onclick="event.stopPropagation()">
+                <svg fill="none" stroke="#0a5c36" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="event-date-chip">📅 Sáb, 22 Jun</div>
+            </div>
+            <div class="event-body">
+              <div class="event-title">Festival Gastronômico de Mongaguá 2025</div>
+              <div class="event-desc">Sabores do litoral em um evento imperdível com chefs renomados, food trucks e muito mais!</div>
+              <div class="event-info">
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Praça Central, Mongaguá
+                </div>
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  18h às 23h
+                </div>
+              </div>
+            </div>
+            <div class="event-footer">
+              <div class="event-company">Prefeitura Mongaguá <small>Entidade organizadora</small></div>
+              <button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button>
+            </div>
+          </div>
+          <div class="event-card" onclick="showPage('detalhe')">
+            <div class="event-img" style="background:linear-gradient(135deg,#0a3090,#3a8fff)">
+              <div class="event-img-overlay"></div>
+              <span class="event-cat-badge">Esporte</span>
+              <button class="event-fav-btn" onclick="event.stopPropagation()">
+                <svg fill="none" stroke="#0a5c36" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="event-date-chip">📅 5-7 Jul</div>
+            </div>
+            <div class="event-body">
+              <div class="event-title">Torneio de Surf Mongaguá Open 2025</div>
+              <div class="event-desc">Surfistas de todo o litoral se reúnem nas ondas de Mongaguá. Entrada gratuita para espectadores!</div>
+              <div class="event-info">
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Praia Central, Mongaguá
+                </div>
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  8h às 18h
+                </div>
+              </div>
+            </div>
+            <div class="event-footer">
+              <div class="event-company">Surf Club Monga <small>Entidade organizadora</small></div>
+              <button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button>
+            </div>
+          </div>
+          <div class="event-card" onclick="showPage('detalhe')">
+            <div class="event-img" style="background:linear-gradient(135deg,#6a0dad,#b44fce)">
+              <div class="event-img-overlay"></div>
+              <span class="event-cat-badge">Cultura</span>
+              <button class="event-fav-btn" onclick="event.stopPropagation()">
+                <svg fill="none" stroke="#0a5c36" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="event-date-chip">📅 30 Jun</div>
+            </div>
+            <div class="event-body">
+              <div class="event-title">Exposição de Arte — Mongaguá nas Artes</div>
+              <div class="event-desc">Artistas locais expõem suas obras retratando a beleza e cultura da cidade. Entrada livre.</div>
+              <div class="event-info">
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Casa de Cultura, Mongaguá
+                </div>
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  10h às 20h
+                </div>
+              </div>
+            </div>
+            <div class="event-footer">
+              <div class="event-company">SESC Litoral <small>Entidade organizadora</small></div>
+              <button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button>
+            </div>
+          </div>
+          <div class="event-card" onclick="showPage('detalhe')">
+            <div class="event-img" style="background:linear-gradient(135deg,#d4500a,#f4a01c)">
+              <div class="event-img-overlay"></div>
+              <span class="event-cat-badge">Música</span>
+              <button class="event-fav-btn" onclick="event.stopPropagation()">
+                <svg fill="none" stroke="#0a5c36" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+              <div class="event-date-chip">📅 Sáb, 22 Jun</div>
+            </div>
+            <div class="event-body">
+              <div class="event-title">Show de Forró — Verão Mongaguá</div>
+              <div class="event-desc">A melhor banda de forró do litoral agita a noite em Mongaguá. Não perca esta noite especial!</div>
+              <div class="event-info">
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Calçadão da Praia
+                </div>
+                <div class="event-info-row">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  21h às 02h
+                </div>
+              </div>
+            </div>
+            <div class="event-footer">
+              <div class="event-company">Bar do Litoral <small>Entidade organizadora</small></div>
+              <button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-btn prev" onclick="moveCarousel(-1)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="carousel-btn next" onclick="moveCarousel(1)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- CATEGORIAS -->
+  <div style="background:white; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="section" style="padding-top:60px;padding-bottom:60px">
+      <div class="section-eyebrow reveal">Explorar</div>
+      <h2 class="section-title reveal">Categorias de <span>eventos</span></h2>
+      <div class="categories-grid" style="margin-top:32px">
+        <div class="cat-card c-verde reveal" onclick="showPage('eventos')">
+          <div class="cat-icon">🎉</div>
+          <div class="cat-name">Festas</div>
+          <div class="cat-count">24 eventos</div>
+        </div>
+        <div class="cat-card c-laranja reveal reveal-delay-1" onclick="showPage('eventos')">
+          <div class="cat-icon">🍽️</div>
+          <div class="cat-name">Gastronomia</div>
+          <div class="cat-count">18 eventos</div>
+        </div>
+        <div class="cat-card c-azul reveal reveal-delay-2" onclick="showPage('eventos')">
+          <div class="cat-icon">🏄</div>
+          <div class="cat-name">Esportes</div>
+          <div class="cat-count">31 eventos</div>
+        </div>
+        <div class="cat-card c-roxo reveal reveal-delay-3" onclick="showPage('eventos')">
+          <div class="cat-icon">🎭</div>
+          <div class="cat-name">Cultura</div>
+          <div class="cat-count">15 eventos</div>
+        </div>
+        <div class="cat-card c-rosa reveal reveal-delay-4" onclick="showPage('eventos')">
+          <div class="cat-icon">🎵</div>
+          <div class="cat-name">Música</div>
+          <div class="cat-count">22 eventos</div>
+        </div>
+        <div class="cat-card c-amarelo reveal" onclick="showPage('eventos')">
+          <div class="cat-icon">🌊</div>
+          <div class="cat-name">Praia</div>
+          <div class="cat-count">37 eventos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- DEPOIMENTOS -->
+  <div style="background:var(--g50); border-top:1px solid var(--border)">
+    <div class="section" style="padding-top:60px;padding-bottom:60px">
+      <div style="text-align:center;margin-bottom:48px">
+        <div class="section-eyebrow reveal" style="justify-content:center">Comunidade</div>
+        <h2 class="section-title reveal" style="margin-bottom:0">O que a <span>galera</span> diz</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Finalmente uma plataforma que organiza os eventos de Mongaguá! Fica muito mais fácil saber o que está rolando na cidade."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">AC</div>
+            <div>
+              <div class="testimonial-name">Ana Carolina</div>
+              <div class="testimonial-role">Moradora de Mongaguá</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-1">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Usamos o ConectaMonga para divulgar nosso restaurante e o resultado foi incrível! Mais de 200 pessoas vieram pelo app."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">RL</div>
+            <div>
+              <div class="testimonial-name">Roberto Lima</div>
+              <div class="testimonial-role">Empresário local</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal reveal-delay-2">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Descobri o Festival Gastronômico pelo ConectaMonga e foi a melhor experiência do verão! Amei demais o evento."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JS</div>
+            <div>
+              <div class="testimonial-name">Julia Santos</div>
+              <div class="testimonial-role">Turista de SP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA BANNER -->
+  <div style="padding:0;max-width:1240px;margin:0 auto;padding:0 32px 80px">
+    <div class="cta-section">
+      <div>
+        <div class="cta-eyebrow">Para empresas</div>
+        <h2 class="cta-title">Sua empresa merece ser vista por toda Mongaguá</h2>
+        <p class="cta-sub">Cadastre sua empresa gratuitamente e comece a divulgar seus eventos para milhares de moradores e turistas.</p>
+      </div>
+      <div class="cta-btns">
+        <button class="btn-hero-primary" onclick="showPage('cadastro-empresa')" style="background:white;color:var(--g900)">
+          Cadastrar empresa
+        </button>
+        <button class="btn-hero-secondary" onclick="showPage('publicar')">
+          Publicar evento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">Conecta<span>Monga</span></div>
+        <p class="footer-brand-desc">A plataforma que conecta moradores, turistas e empresas de Mongaguá através dos melhores eventos da cidade.</p>
+        <div class="footer-social">
+          <div class="social-icon">📘</div>
+          <div class="social-icon">📸</div>
+          <div class="social-icon">🐦</div>
+          <div class="social-icon">▶️</div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Plataforma</div>
+        <a class="footer-link" onclick="showPage('home')">Início</a>
+        <a class="footer-link" onclick="showPage('eventos')">Eventos</a>
+        <a class="footer-link" onclick="showPage('sobre')">Sobre Nós</a>
+        <a class="footer-link" onclick="showPage('favoritos')">Favoritos</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Empresa</div>
+        <a class="footer-link" onclick="showPage('login-empresa')">Login Empresa</a>
+        <a class="footer-link" onclick="showPage('cadastro-empresa')">Cadastrar Empresa</a>
+        <a class="footer-link" onclick="requireLogin('publicar')">Publicar Evento</a>
+        <a class="footer-link" onclick="showPage('perfil-empresa')">Perfil Empresa</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Usuário</div>
+        <a class="footer-link" onclick="showPage('login-user')">Login</a>
+        <a class="footer-link" onclick="showPage('cadastro-user')">Cadastro</a>
+        <a class="footer-link" onclick="showPage('perfil-user')">Meu Perfil</a>
+        <a class="footer-link" onclick="showPage('feedbacks')">Feedbacks</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 <span>ConectaMonga</span>. Todos os direitos reservados.</span>
+      <span>Feito com 💚 em Mongaguá</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: EVENTOS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-eventos">
+  <div style="padding-top:72px;min-height:100vh;background:var(--bg)">
+    <div style="background:linear-gradient(135deg,#022617,var(--g900));padding:60px 32px;text-align:center">
+      <div style="max-width:600px;margin:0 auto">
+        <div class="section-eyebrow" style="justify-content:center;color:var(--g300)">Mongaguá</div>
+        <h1 style="font-family:'Bowlby One SC',cursive;font-size:clamp(1.8rem,4vw,2.8rem);color:white;margin-bottom:16px;line-height:1.1">Todos os eventos</h1>
+        <p style="color:rgba(255,255,255,.75);margin-bottom:28px">Explore o que está acontecendo na cidade</p>
+        <div style="position:relative;max-width:500px;margin:0 auto">
+          <input type="text" id="searchInput" placeholder="🔍  Buscar eventos, locais..." oninput="filtrarEventos(this.value)" style="width:100%;padding:15px 20px 15px 48px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:0.95rem;outline:none;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+        </div>
+      </div>
+    </div>
+    <div class="section" style="padding-top:48px">
+      <div class="filter-bar">
+        <div class="chip active">Todos</div>
+        <div class="chip">🎉 Festas</div>
+        <div class="chip">🍽️ Gastronomia</div>
+        <div class="chip">🏄 Esportes</div>
+        <div class="chip">🎭 Cultura</div>
+        <div class="chip">🎵 Música</div>
+        <div class="chip">🌊 Praia</div>
+      </div>
+      <div class="events-grid" id="eventsGrid">
+        <div class="event-card" data-search="festival gastronômico gastronomia praça central prefeitura" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#0a5c36,#2eb872)"><div class="event-img-overlay"></div><span class="event-cat-badge">Gastronomia</span><div class="event-date-chip">📅 22 Jun</div></div>
+          <div class="event-body"><div class="event-title">Festival Gastronômico de Mongaguá</div><div class="event-desc">O maior evento gastronômico do litoral sul paulista.</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Praça Central</div><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>18h às 23h</div></div></div>
+          <div class="event-footer"><div class="event-company">Prefeitura<small>Organizadora</small></div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+        <div class="event-card" data-search="torneio surf esporte praia central surf club mongaguá open" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#0a3090,#3a8fff)"><div class="event-img-overlay"></div><span class="event-cat-badge">Esporte</span><div class="event-date-chip">📅 5-7 Jul</div></div>
+          <div class="event-body"><div class="event-title">Torneio de Surf Mongaguá Open</div><div class="event-desc">As melhores ondas, os melhores surfistas.</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Praia Central</div><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>8h às 18h</div></div></div>
+          <div class="event-footer"><div class="event-company">Surf Club<small>Organizadora</small></div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+        <div class="event-card" data-search="exposição arte cultura casa de cultura sesc litoral mongaguá artes" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#6a0dad,#b44fce)"><div class="event-img-overlay"></div><span class="event-cat-badge">Cultura</span><div class="event-date-chip">📅 30 Jun</div></div>
+          <div class="event-body"><div class="event-title">Exposição de Arte — Mongaguá nas Artes</div><div class="event-desc">Artistas locais exibem suas melhores obras.</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Casa de Cultura</div><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>10h às 20h</div></div></div>
+          <div class="event-footer"><div class="event-company">SESC Litoral<small>Organizadora</small></div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+        <div class="event-card" data-search="show forró música calçadão praia bar do litoral verão" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#d4500a,#f4a01c)"><div class="event-img-overlay"></div><span class="event-cat-badge">Música</span><div class="event-date-chip">📅 22 Jun</div></div>
+          <div class="event-body"><div class="event-title">Show de Forró — Verão Mongaguá</div><div class="event-desc">A noite mais animada do verão.</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Calçadão da Praia</div><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>21h às 02h</div></div></div>
+          <div class="event-footer"><div class="event-company">Bar do Litoral<small>Organizadora</small></div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+        <div class="event-card" data-search="caminhada ecológica natureza restinga parque meio ambiente" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#145a32,#27ae60)"><div class="event-img-overlay"></div><span class="event-cat-badge">Natureza</span><div class="event-date-chip">📅 29 Jun</div></div>
+          <div class="event-body"><div class="event-title">Caminhada Ecológica pela Restinga</div><div class="event-desc">Conheça a flora nativa do litoral em caminhada guiada.</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Parque das Restingas</div><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>7h às 10h</div></div></div>
+          <div class="event-footer"><div class="event-company">Secretaria de Meio Ambiente<small>Organizadora</small></div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+        <div class="event-card" data-search="festa junina quadrilha comidas típicas ginásio municipal associação cultural" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#c0392b,#e74c3c)"><div class="event-img-overlay"></div><span class="event-cat-badge">Festa</span><div class="event-date-chip">📅 28 Jun</div></div>
+          <div class="event-body"><div class="event-title">Festa Junina Tradicional — Monga 2025</div><div class="event-desc">A festa mais esperada do ano com quadrilha, comidas típicas e muito xote!</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Ginásio Municipal</div><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>19h às 01h</div></div></div>
+          <div class="event-footer"><div class="event-company">Associação Cultural<small>Organizadora</small></div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+      </div>
+      <div id="semResultados" style="display:none;text-align:center;padding:60px 20px;color:var(--ink4)">
+        <div style="font-size:3rem;margin-bottom:16px">🔍</div>
+        <div style="font-size:1.1rem;font-weight:600;color:var(--ink3);margin-bottom:8px">Nenhum evento encontrado</div>
+        <div style="font-size:0.9rem">Tente buscar por outro nome ou local</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: DETALHES DO EVENTO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-detalhe">
+  <div class="event-detail-page">
+    <div class="event-detail-banner" style="background:linear-gradient(135deg,#0a5c36,#1a8a52,#2eb872)">
+      <div class="event-detail-overlay"></div>
+      <div style="position:absolute;inset:0;display:flex;align-items:flex-end;padding:0 32px;">
+        <div style="max-width:1240px;width:100%;margin:0 auto;padding-bottom:40px">
+          <button onclick="showPage('eventos')" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:var(--radius-sm);padding:8px 14px;color:white;font-size:0.82rem;font-weight:600;cursor:pointer;margin-bottom:16px;font-family:'DM Sans',sans-serif;backdrop-filter:blur(8px)">← Voltar</button>
+          <span class="event-detail-cat">🍽️ Gastronomia</span>
+          <h1 class="event-detail-title">Festival Gastronômico<br>de Mongaguá 2025</h1>
+          <div class="event-detail-meta">
+            <div class="event-detail-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Sábado, 22 de Junho de 2025</div>
+            <div class="event-detail-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 18h às 23h</div>
+            <div class="event-detail-meta-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Praça Central, Mongaguá-SP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="event-detail-body">
+      <div class="event-detail-main">
+        <div class="countdown-box" style="margin-bottom:32px">
+          <div class="countdown-label">⏱️ Começa em</div>
+          <div class="countdown-nums">
+            <div class="countdown-unit"><div class="countdown-num" id="cd-days">07</div><div class="countdown-unit-lbl">dias</div></div>
+            <div style="font-family:'Bowlby One SC',cursive;font-size:1.8rem;opacity:.5;line-height:1;margin-top:2px">:</div>
+            <div class="countdown-unit"><div class="countdown-num" id="cd-hours">14</div><div class="countdown-unit-lbl">horas</div></div>
+            <div style="font-family:'Bowlby One SC',cursive;font-size:1.8rem;opacity:.5;line-height:1;margin-top:2px">:</div>
+            <div class="countdown-unit"><div class="countdown-num" id="cd-mins">32</div><div class="countdown-unit-lbl">min</div></div>
+            <div style="font-family:'Bowlby One SC',cursive;font-size:1.8rem;opacity:.5;line-height:1;margin-top:2px">:</div>
+            <div class="countdown-unit"><div class="countdown-num" id="cd-secs">45</div><div class="countdown-unit-lbl">seg</div></div>
+          </div>
+        </div>
+        <div style="margin-bottom:32px">
+          <div class="detail-section-title">Sobre o evento</div>
+          <p class="event-detail-desc">O Festival Gastronômico de Mongaguá é o maior evento culinário do litoral sul paulista, reunindo os melhores chefs, restaurantes e produtores locais para uma experiência única de sabores e cultura. Nesta edição de 2025, o festival contará com mais de 30 expositores, shows ao vivo, oficinas culinárias gratuitas e uma área especial kids.<br><br>Venha descobrir os sabores autênticos de Mongaguá, provar os melhores frutos do mar frescos do dia, e se encantar com a hospitalidade do nosso povo. Entrada gratuita para toda a família!</p>
+        </div>
+        <div>
+          <div class="detail-section-title">Localização</div>
+          <div class="map-placeholder">
+            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div>Praça Central, Mongaguá — SP</div>
+            <button onclick="window.open('https://maps.google.com?q=Mongaguá+SP','_blank')" style="display:inline-flex;align-items:center;gap:6px;background:var(--g900);color:white;border:none;padding:8px 18px;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px">🗺️ Abrir no Google Maps</button>
+          </div>
+        </div>
+        <div>
+          <div class="detail-section-title">Avaliações</div>
+          <div class="feedback-list">
+            <div class="feedback-item">
+              <div class="feedback-header">
+                <div class="feedback-author"><div class="feedback-avatar">JS</div><div><div class="feedback-name">Julia Santos</div><div class="feedback-date">15 de junho</div></div></div>
+                <div class="feedback-stars">★★★★★</div>
+              </div>
+              <p class="feedback-text">Evento incrível! A organização foi perfeita e a comida maravilhosa. Já estou esperando a próxima edição!</p>
+            </div>
+            <div class="feedback-item">
+              <div class="feedback-header">
+                <div class="feedback-author"><div class="feedback-avatar">MA</div><div><div class="feedback-name">Marcos Alves</div><div class="feedback-date">12 de junho</div></div></div>
+                <div class="feedback-stars">★★★★☆</div>
+              </div>
+              <p class="feedback-text">Muito bom! Só faltou mais opção de estacionamento, mas o conteúdo do evento foi excelente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="event-detail-sidebar">
+        <div class="sidebar-card">
+          <div class="interested-row">
+            <span>👥</span>
+            <div><b>342 pessoas</b><br>confirmaram interesse</div>
+          </div>
+          <button class="btn-primary-full">❤️ Tenho interesse</button>
+          <button class="btn-outline-full">🔗 Compartilhar evento</button>
+          <button class="btn-outline-full">🗺️ Como chegar</button>
+        </div>
+        <div class="sidebar-card">
+          <div class="detail-section-title" style="margin-bottom:16px">Organizado por</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="width:44px;height:44px;border-radius:10px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🏛️</div>
+            <div>
+              <div style="font-weight:700;font-size:0.92rem;color:var(--ink)">Prefeitura de Mongaguá</div>
+              <div style="font-size:0.78rem;color:var(--ink4)">⭐⭐⭐⭐⭐ 4.8 · 45 eventos</div>
+            </div>
+          </div>
+          <button class="btn-outline-full" onclick="showPage('perfil-empresa')">Ver perfil completo</button>
+        </div>
+        <div class="sidebar-card">
+          <div class="detail-section-title" style="margin-bottom:16px">Contato direto</div>
+          <a class="btn-wpp" href="#" style="width:100%;justify-content:center;margin-bottom:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#128c7e"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+            WhatsApp do organizador
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: SOBRE NÓS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-sobre">
+  <div class="sobre-page">
+    <div class="sobre-hero">
+      <div class="hero-orb1" style="opacity:.5"></div>
+      <div class="hero-orb2" style="opacity:.4"></div>
+      <div class="sobre-hero-inner">
+        <div class="hero-badge" style="justify-content:center;margin:0 auto 24px">
+          <span class="hero-badge-dot"></span> Sobre o ConectaMonga
+        </div>
+        <h1>Conectando <span>Mongaguá</span> com seus eventos</h1>
+        <p>Somos uma plataforma digital criada para valorizar a cultura local, impulsionar o turismo e fortalecer o comércio de Mongaguá através dos eventos.</p>
+      </div>
+    </div>
+    <div class="sobre-content">
+      <div style="text-align:center;margin-bottom:60px">
+        <div class="section-eyebrow reveal" style="justify-content:center">Nossa missão</div>
+        <h2 class="section-title reveal" style="max-width:600px;margin:0 auto 20px">Colocando Mongaguá no <span>mapa digital</span></h2>
+        <p style="color:var(--ink3);line-height:1.8;max-width:640px;margin:0 auto;font-size:0.95rem">O ConectaMonga nasceu da necessidade de conectar moradores, turistas e empresas locais de forma simples, moderna e eficiente. Nossa plataforma é o ponto de encontro entre quem quer se divertir e quem tem muito a oferecer.</p>
+      </div>
+      <div class="values-grid">
+        <div class="value-card reveal">
+          <div class="value-icon">🏘️</div>
+          <div class="value-title">Comunidade Local</div>
+          <div class="value-desc">Fortalecemos os laços entre moradores e incentivamos o consumo e turismo local em Mongaguá.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-1">
+          <div class="value-icon">🚀</div>
+          <div class="value-title">Tecnologia Acessível</div>
+          <div class="value-desc">Plataforma moderna e intuitiva para qualquer pessoa ou empresa, sem necessidade de conhecimento técnico.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-2">
+          <div class="value-icon">🌊</div>
+          <div class="value-title">Turismo Sustentável</div>
+          <div class="value-desc">Promovemos Mongaguá como destino turístico, valorizando sua natureza, praias e cultura única.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-3">
+          <div class="value-icon">💚</div>
+          <div class="value-title">Impacto Social</div>
+          <div class="value-desc">Cada evento divulgado gera impacto econômico positivo para as pequenas e médias empresas locais.</div>
+        </div>
+        <div class="value-card reveal reveal-delay-4">
+          <div class="value-icon">🤝</div>
+          <div class="value-title">Parcerias Locais</div>
+          <div class="value-desc">Trabalhamos junto com prefeitura, associações e empresas para criar um ecossistema de eventos vibrante.</div>
+        </div>
+        <div class="value-card reveal">
+          <div class="value-icon">📱</div>
+          <div class="value-title">Mobile First</div>
+          <div class="value-desc">Desenvolvido pensando no mobile, para que você acesse de qualquer lugar com praticidade e velocidade.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: LOGIN USUÁRIO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-login-user">
+  <div class="auth-page">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-top">
+          <div class="auth-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <h2>Bem-vindo de volta!</h2>
+          <p>Entre na sua conta para acessar os eventos</p>
+        </div>
+        <div class="auth-body">
+          <div id="loginMsg" style="display:none;background:#fff3cd;border:1px solid #ffc107;border-radius:var(--radius-sm);padding:12px 16px;font-size:0.85rem;font-weight:600;color:#856404;margin-bottom:16px;align-items:center;gap:8px"></div>
+          <button class="social-btn" id="btnGoogle" onclick="loginSocial('google')">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continuar com Google
+          </button>
+          <button class="social-btn" id="btnFacebook" style="margin-bottom:0" onclick="loginSocial('facebook')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Continuar com Facebook
+          </button>
+          <div class="divider"><span>ou entre com e-mail</span></div>
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" id="loginEmail" class="form-input" placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" id="loginSenha" class="form-input" placeholder="••••••••">
+          </div>
+          <div class="remember-row">
+            <label class="checkbox-label">
+              <input type="checkbox"> Lembrar de mim
+            </label>
+            <a class="link-small">Esqueci minha senha</a>
+          </div>
+          <button class="btn-submit" onclick="loginComEmail()">Entrar na conta</button>
+          <div class="auth-footer-link">Não tem conta? <a onclick="showPage('cadastro-user')">Criar conta grátis</a></div>
+          <div class="auth-footer-link" style="margin-top:8px">É empresa? <a onclick="showPage('login-empresa')">Login empresarial</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: CADASTRO USUÁRIO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-cadastro-user">
+  <div class="auth-page">
+    <div class="auth-wrap" style="max-width:520px">
+      <div class="auth-card">
+        <div class="auth-top">
+          <div class="auth-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
+          <h2>Criar conta gratuita</h2>
+          <p>Acesse eventos e faça parte da comunidade</p>
+        </div>
+        <div class="auth-body">
+          <div class="form-group">
+            <label class="form-label">Nome completo <span class="req">*</span></label>
+            <input type="text" class="form-input" placeholder="Seu nome completo">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">E-mail <span class="req">*</span></label>
+              <input type="email" class="form-input" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefone <span class="req">*</span></label>
+              <input type="tel" class="form-input" placeholder="(13) 99999-9999">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Data de nascimento</label>
+              <input type="date" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Foto de perfil</label>
+              <input type="file" class="form-input" accept="image/*" style="padding:9px 14px">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Senha <span class="req">*</span></label>
+              <input type="password" class="form-input" placeholder="Min. 8 caracteres">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar senha <span class="req">*</span></label>
+              <input type="password" class="form-input" placeholder="Repita a senha">
+            </div>
+          </div>
+          <button class="btn-submit" onclick="fazerLogin('Julia Santos', 'usuario')">Criar minha conta</button>
+          <div class="auth-footer-link">Já tem conta? <a onclick="showPage('login-user')">Entrar</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: LOGIN EMPRESA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-login-empresa">
+  <div class="auth-page">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-top" style="background:linear-gradient(135deg,#022617,#0a5c36,#145a32)">
+          <div class="auth-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <h2>Acesso Empresarial</h2>
+          <p>Entre com os dados da sua empresa</p>
+        </div>
+        <div class="auth-body">
+          <div class="info-box">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Acesso exclusivo para empresas cadastradas na plataforma ConectaMonga.
+          </div>
+          <div class="form-group">
+            <label class="form-label">E-mail empresarial</label>
+            <input type="email" class="form-input" placeholder="empresa@email.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" class="form-input" placeholder="••••••••">
+          </div>
+          <button class="btn-submit" onclick="fazerLogin('Restaurante Beira-Mar', 'empresa')">Acessar painel</button>
+          <div class="auth-footer-link">Não tem empresa cadastrada? <a onclick="showPage('cadastro-empresa')">Cadastre agora</a></div>
+          <div class="auth-footer-link" style="margin-top:8px">É usuário? <a onclick="showPage('login-user')">Login de usuário</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: CADASTRO EMPRESA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-cadastro-empresa">
+  <div class="auth-page" style="align-items:flex-start;padding-top:100px">
+    <div class="auth-wrap" style="max-width:600px;padding-bottom:40px">
+      <div class="auth-card">
+        <div class="auth-top" style="background:linear-gradient(135deg,#022617,#0a5c36,#145a32)">
+          <div class="auth-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <h2>Cadastrar Empresa</h2>
+          <p>Conecte sua empresa a toda Mongaguá</p>
+        </div>
+        <div class="auth-body">
+          <div class="info-box">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Cadastro gratuito! Após aprovação você poderá publicar eventos e acessar o painel da empresa.
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome da empresa <span class="req">*</span></label>
+            <input type="text" class="form-input" placeholder="Nome da sua empresa">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">CNPJ <span class="req">*</span></label>
+              <input type="text" class="form-input" placeholder="00.000.000/0001-00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Categoria <span class="req">*</span></label>
+              <select class="form-input" style="cursor:pointer">
+                <option>🍽️ Gastronomia</option>
+                <option>🎭 Cultura</option>
+                <option>🏄 Esportes</option>
+                <option>🎵 Música</option>
+                <option>🏨 Hospedagem</option>
+                <option>🛍️ Comércio</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descrição da empresa</label>
+            <textarea class="form-textarea" placeholder="Descreva sua empresa e o que você oferece..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">E-mail <span class="req">*</span></label>
+              <input type="email" class="form-input" placeholder="contato@empresa.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp <span class="req">*</span></label>
+              <input type="tel" class="form-input" placeholder="(13) 99999-9999">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Instagram</label>
+              <input type="text" class="form-input" placeholder="@suaempresa">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Site</label>
+              <input type="url" class="form-input" placeholder="www.suaempresa.com.br">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Endereço completo</label>
+            <input type="text" class="form-input" placeholder="Rua, número, bairro — Mongaguá">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Horário de funcionamento</label>
+            <input type="text" class="form-input" placeholder="Ex: Seg-Sex 9h às 18h | Sáb 9h às 13h">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Logo da empresa</label>
+              <input type="file" class="form-input" accept="image/*" style="padding:9px 14px">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Banner</label>
+              <input type="file" class="form-input" accept="image/*" style="padding:9px 14px">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Senha <span class="req">*</span></label>
+              <input type="password" class="form-input" placeholder="Min. 8 caracteres">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirmar senha <span class="req">*</span></label>
+              <input type="password" class="form-input" placeholder="Repita a senha">
+            </div>
+          </div>
+          <button class="btn-submit" onclick="showPage('perfil-empresa')">Cadastrar empresa</button>
+          <div class="auth-footer-link">Já tem cadastro? <a onclick="showPage('login-empresa')">Fazer login</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: PERFIL USUÁRIO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-perfil-user">
+  <div class="profile-page">
+    <div class="profile-banner">
+      <div style="position:absolute;inset:0;background:linear-gradient(160deg,#022617,var(--g900),var(--g700))"></div>
+      <div class="hero-grid-overlay" style="opacity:.3"></div>
+    </div>
+    <div class="profile-content">
+      <div class="profile-top">
+        <div class="profile-avatar">JS</div>
+        <div class="profile-info">
+          <div class="profile-name">Julia Santos</div>
+          <div class="profile-sub">Moradora de Mongaguá · Membro desde Jan 2024</div>
+        </div>
+        <div style="margin-left:auto;padding-bottom:8px">
+          <button class="btn-ghost-nav">⚙️ Editar perfil</button>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-sidebar">
+          <div class="sidebar-card" style="margin-bottom:16px">
+            <div class="detail-section-title" style="margin-bottom:16px">Minhas estatísticas</div>
+            <div class="profile-stat-row"><span class="key">Eventos favoritados</span><span class="val">24</span></div>
+            <div class="profile-stat-row"><span class="key">Avaliações feitas</span><span class="val">12</span></div>
+            <div class="profile-stat-row"><span class="key">Comentários</span><span class="val">8</span></div>
+            <div class="profile-stat-row"><span class="key">Compartilhamentos</span><span class="val">31</span></div>
+          </div>
+          <div class="sidebar-card">
+            <div class="detail-section-title" style="margin-bottom:16px">Configurações</div>
+            <div class="profile-stat-row"><span class="key">Tema</span><span class="val" style="color:var(--g700)">Claro ☀️</span></div>
+            <div class="profile-stat-row"><span class="key">Notificações</span><span class="val">Ativas</span></div>
+            <div class="profile-stat-row"><span class="key">Privacidade</span><span class="val">Pública</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="dashboard-tabs">
+            <div class="dash-tab active">❤️ Favoritos</div>
+            <div class="dash-tab">⭐ Avaliações</div>
+            <div class="dash-tab">🕐 Histórico</div>
+          </div>
+          <div class="events-grid">
+            <div class="event-card" onclick="showPage('detalhe')">
+              <div class="event-img" style="background:linear-gradient(135deg,#0a5c36,#2eb872)"><div class="event-img-overlay"></div><span class="event-cat-badge">Gastronomia</span><div class="event-date-chip">📅 22 Jun</div></div>
+              <div class="event-body"><div class="event-title">Festival Gastronômico de Mongaguá</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Praça Central</div></div></div>
+              <div class="event-footer"><div class="event-company">Prefeitura</div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver</button></div>
+            </div>
+            <div class="event-card" onclick="showPage('detalhe')">
+              <div class="event-img" style="background:linear-gradient(135deg,#d4500a,#f4a01c)"><div class="event-img-overlay"></div><span class="event-cat-badge">Música</span><div class="event-date-chip">📅 22 Jun</div></div>
+              <div class="event-body"><div class="event-title">Show de Forró — Verão Mongaguá</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Calçadão da Praia</div></div></div>
+              <div class="event-footer"><div class="event-company">Bar do Litoral</div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: PERFIL EMPRESA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-perfil-empresa">
+  <div class="empresa-page">
+    <div class="empresa-banner">
+      <div class="empresa-banner-overlay"></div>
+    </div>
+    <div class="empresa-content">
+      <div class="empresa-header">
+        <div class="empresa-logo">🍕</div>
+        <div class="empresa-info">
+          <div class="empresa-name">Restaurante Beira-Mar</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px">
+            <span class="empresa-cat-tag">🍽️ Gastronomia</span>
+            <div style="display:flex;align-items:center;gap:5px;font-size:0.88rem;color:var(--ink3)">
+              <span style="color:#f4a01c">★★★★★</span>
+              <b style="color:var(--ink)">4.9</b>
+              <span>(127 avaliações)</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-left:auto">
+          <a class="btn-wpp" href="#" onclick="return false" style="margin-right:8px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#128c7e"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/></svg>
+            WhatsApp
+          </a>
+          <button class="btn-nav-primary" onclick="requireLogin('publicar')">+ Publicar evento</button>
+        </div>
+      </div>
+      <div class="empresa-grid">
+        <div>
+          <div class="empresa-details-card" style="margin-bottom:24px">
+            <p style="font-size:0.92rem;color:var(--ink3);line-height:1.8">O Restaurante Beira-Mar é o melhor frutos do mar de Mongaguá, localizado à beira-mar com vista privilegiada. Nosso cardápio é elaborado diariamente com os pescados mais frescos da região, preparados com receitas tradicionais e toque do chef.<br><br>Ambiente familiar, aconchegante e com estacionamento gratuito. Reservas pelo WhatsApp.</p>
+          </div>
+          <div class="empresa-details-card" style="margin-bottom:24px">
+            <div class="detail-section-title" style="margin-bottom:0">Informações</div>
+            <div class="empresa-detail-row">
+              <span class="empresa-detail-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+              <div><div class="empresa-detail-label">Endereço</div><div class="empresa-detail-val">Av. Beira Mar, 450 — Mongaguá-SP</div></div>
+            </div>
+            <div class="empresa-detail-row">
+              <span class="empresa-detail-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+              <div><div class="empresa-detail-label">Horário</div><div class="empresa-detail-val">Seg-Qui 11h-22h · Sex-Dom 11h-00h</div></div>
+            </div>
+            <div class="empresa-detail-row">
+              <span class="empresa-detail-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.64 12a19.79 19.79 0 0 1-3-8.59A2 2 0 0 1 3.56 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+              <div><div class="empresa-detail-label">WhatsApp</div><div class="empresa-detail-val">(13) 99999-9999</div></div>
+            </div>
+            <div class="empresa-detail-row">
+              <span class="empresa-detail-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></span>
+              <div><div class="empresa-detail-label">Instagram</div><div class="empresa-detail-val">@restaurante.beiramar</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="detail-section-title" style="margin-bottom:20px">Avaliações dos clientes</div>
+            <div class="feedback-list">
+              <div class="feedback-item">
+                <div class="feedback-header">
+                  <div class="feedback-author"><div class="feedback-avatar">AC</div><div><div class="feedback-name">Ana Carolina</div><div class="feedback-date">3 dias atrás</div></div></div>
+                  <div class="feedback-stars">★★★★★</div>
+                </div>
+                <p class="feedback-text">Melhor frutos do mar de Mongaguá! O camarão grelhado estava divino. Atendimento impecável, voltarei com certeza!</p>
+              </div>
+              <div class="feedback-item">
+                <div class="feedback-header">
+                  <div class="feedback-author"><div class="feedback-avatar">RL</div><div><div class="feedback-name">Ricardo Lima</div><div class="feedback-date">1 semana atrás</div></div></div>
+                  <div class="feedback-stars">★★★★★</div>
+                </div>
+                <p class="feedback-text">Ambiente incrível com vista para o mar. Comida fresquíssima e preço justo. Recomendo demais!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sidebar-card" style="margin-bottom:16px">
+            <div class="detail-section-title" style="margin-bottom:14px">Eventos da empresa</div>
+            <div onclick="showPage('detalhe')" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:10px;border-radius:var(--radius-sm);transition:var(--transition)" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background='none'">
+              <div style="width:52px;height:52px;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--g900),var(--g500));flex-shrink:0"></div>
+              <div><div style="font-weight:700;font-size:0.88rem;color:var(--ink)">Noite de Frutos do Mar</div><div style="font-size:0.78rem;color:var(--ink4);margin-top:2px">Sáb, 29 Jun · 19h</div></div>
+            </div>
+            <div onclick="showPage('detalhe')" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;padding:10px;border-radius:var(--radius-sm);transition:var(--transition)" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background='none'">
+              <div style="width:52px;height:52px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#d4500a,#f4a01c);flex-shrink:0"></div>
+              <div><div style="font-weight:700;font-size:0.88rem;color:var(--ink)">Almoço do Pescador</div><div style="font-size:0.78rem;color:var(--ink4);margin-top:2px">Dom, 30 Jun · 11h</div></div>
+            </div>
+            <button class="btn-outline-full" style="margin-top:12px" onclick="showPage('publicar')">+ Publicar evento</button>
+          </div>
+          <div class="sidebar-card">
+            <div class="detail-section-title" style="margin-bottom:14px">Avaliação geral</div>
+            <div style="text-align:center;margin-bottom:12px">
+              <div style="font-family:'Bowlby One SC',cursive;font-size:3rem;color:var(--g900);line-height:1">4.9</div>
+              <div style="color:#f4a01c;font-size:1.2rem">★★★★★</div>
+              <div style="font-size:0.82rem;color:var(--ink4);margin-top:4px">127 avaliações</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--ink3)">
+                <span>5★</span>
+                <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:85%;height:100%;background:var(--g500);border-radius:3px"></div></div>
+                <span>85%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--ink3)">
+                <span>4★</span>
+                <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:10%;height:100%;background:var(--g500);border-radius:3px"></div></div>
+                <span>10%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--ink3)">
+                <span>3★</span>
+                <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:5%;height:100%;background:var(--g500);border-radius:3px"></div></div>
+                <span>5%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: PUBLICAR EVENTO -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-publicar">
+  <div class="publish-page">
+    <div class="publish-inner">
+      <div class="publish-header">
+        <h1 class="publish-title">Publicar novo evento</h1>
+        <p class="publish-sub">Preencha os detalhes para divulgar seu evento em Mongaguá</p>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Imagem do evento</div>
+        <div class="upload-zone" onclick="document.getElementById('bannerInput').click()">
+          <input type="file" id="bannerInput" accept="image/*" style="display:none" onchange="previewBanner(event)">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-label">Clique para enviar o banner do evento</div>
+          <div class="upload-hint">PNG, JPG até 5MB · Tamanho recomendado: 1200×600px</div>
+        </div>
+        <div class="preview-card" style="margin-top:20px">
+          <div class="preview-label">Pré-visualização do card</div>
+          <div class="preview-mini">
+            <div class="preview-mini-img" id="previewImg" style="background:linear-gradient(135deg,var(--g900),var(--g500))"></div>
+            <div class="preview-mini-body">
+              <div class="preview-mini-title" id="previewTitle">Nome do evento aparece aqui</div>
+              <div class="preview-mini-meta" id="previewMeta">📅 Data · 📍 Local</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Informações principais</div>
+        <div class="form-group">
+          <label class="form-label">Nome do evento <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="Ex: Festival Gastronômico de Mongaguá" oninput="document.getElementById('previewTitle').textContent=this.value||'Nome do evento aparece aqui'">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição do evento <span class="req">*</span></label>
+          <textarea class="form-textarea" placeholder="Descreva o evento com detalhes para atrair mais público..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="margin-bottom:12px">Categoria <span class="req">*</span></label>
+          <div class="cat-pills" id="catPills">
+            <div class="cat-pill" onclick="selectCat(this)">🎉 Festas</div>
+            <div class="cat-pill" onclick="selectCat(this)">🍽️ Gastronomia</div>
+            <div class="cat-pill" onclick="selectCat(this)">🏄 Esportes</div>
+            <div class="cat-pill" onclick="selectCat(this)">🎭 Cultura</div>
+            <div class="cat-pill" onclick="selectCat(this)">🎵 Música</div>
+            <div class="cat-pill" onclick="selectCat(this)">🌊 Praia</div>
+            <div class="cat-pill" onclick="selectCat(this)">🌿 Natureza</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Data, hora e local</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Data <span class="req">*</span></label>
+            <input type="date" class="form-input" oninput="document.getElementById('previewMeta').textContent='📅 '+this.value+' · 📍 Local'">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Horário <span class="req">*</span></label>
+            <input type="time" class="form-input">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Endereço completo <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="Rua, número, bairro — Mongaguá">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link do Google Maps</label>
+          <input type="url" class="form-input" placeholder="https://maps.google.com/...">
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">Contato e redes sociais</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">WhatsApp</label>
+            <input type="tel" class="form-input" placeholder="(13) 99999-9999">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instagram</label>
+            <input type="text" class="form-input" placeholder="@seuevento">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Site do evento</label>
+            <input type="url" class="form-input" placeholder="www.seuevento.com.br">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags</label>
+            <input type="text" class="form-input" placeholder="verão, praia, família, gratuito...">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn-ghost-nav" style="padding:14px 28px">Salvar rascunho</button>
+        <button class="btn-nav-primary" style="padding:14px 28px;font-size:0.95rem">🚀 Publicar evento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: FAVORITOS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-favoritos">
+  <div class="fav-page">
+    <div class="fav-inner">
+      <div class="page-title">❤️ Meus Favoritos</div>
+      <p class="page-sub">Eventos que você salvou para não perder</p>
+      <div class="events-grid">
+        <div class="event-card" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#0a5c36,#2eb872)"><div class="event-img-overlay"></div><span class="event-cat-badge">Gastronomia</span><button class="event-fav-btn" onclick="event.stopPropagation()" style="background:var(--g500)"><svg fill="red" stroke="red" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button><div class="event-date-chip">📅 22 Jun</div></div>
+          <div class="event-body"><div class="event-title">Festival Gastronômico de Mongaguá</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Praça Central</div></div></div>
+          <div class="event-footer"><div class="event-company">Prefeitura</div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+        <div class="event-card" onclick="showPage('detalhe')">
+          <div class="event-img" style="background:linear-gradient(135deg,#0a3090,#3a8fff)"><div class="event-img-overlay"></div><span class="event-cat-badge">Esporte</span><button class="event-fav-btn" onclick="event.stopPropagation()" style="background:var(--g500)"><svg fill="red" stroke="red" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button><div class="event-date-chip">📅 5-7 Jul</div></div>
+          <div class="event-body"><div class="event-title">Torneio de Surf Mongaguá Open</div><div class="event-info"><div class="event-info-row"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Praia Central</div></div></div>
+          <div class="event-footer"><div class="event-company">Surf Club</div><button class="btn-ver-mais" onclick="showPage('detalhe')">Ver mais</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: FEEDBACKS -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-feedbacks">
+  <div class="feedback-page">
+    <div class="feedback-inner">
+      <div class="page-title">⭐ Feedbacks & Avaliações</div>
+      <p class="page-sub" style="margin-bottom:32px">Compartilhe sua experiência e ajude a comunidade</p>
+      <div class="feedback-form-card">
+        <div class="detail-section-title" style="margin-bottom:20px">Avaliar evento ou empresa</div>
+        <div class="form-group">
+          <label class="form-label">Evento ou empresa</label>
+          <select class="form-input" style="cursor:pointer">
+            <option>Festival Gastronômico de Mongaguá</option>
+            <option>Torneio de Surf Mongaguá Open</option>
+            <option>Restaurante Beira-Mar</option>
+            <option>Surf Club Mongaguá</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sua nota</label>
+          <div class="star-selector" id="starSelector">
+            <button class="star-btn" onclick="setStar(1)">★</button>
+            <button class="star-btn" onclick="setStar(2)">★</button>
+            <button class="star-btn" onclick="setStar(3)">★</button>
+            <button class="star-btn" onclick="setStar(4)">★</button>
+            <button class="star-btn" onclick="setStar(5)">★</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Seu comentário</label>
+          <textarea class="form-textarea" placeholder="Conte como foi sua experiência..."></textarea>
+        </div>
+        <button class="btn-submit" style="margin-top:0">Publicar avaliação</button>
+      </div>
+      <div class="detail-section-title" style="margin-bottom:20px">Avaliações recentes</div>
+      <div class="feedback-list">
+        <div class="feedback-item">
+          <div class="feedback-header">
+            <div class="feedback-author"><div class="feedback-avatar">JS</div><div><div class="feedback-name">Julia Santos</div><div class="feedback-date">Festival Gastronômico · 3 dias atrás</div></div></div>
+            <div class="feedback-stars">★★★★★</div>
+          </div>
+          <p class="feedback-text">Evento incrível! A organização foi perfeita e a comida maravilhosa. Já estou esperando a próxima edição!</p>
+        </div>
+        <div class="feedback-item">
+          <div class="feedback-header">
+            <div class="feedback-author"><div class="feedback-avatar">RL</div><div><div class="feedback-name">Roberto Lima</div><div class="feedback-date">Restaurante Beira-Mar · 1 semana</div></div></div>
+            <div class="feedback-stars">★★★★★</div>
+          </div>
+          <p class="feedback-text">Melhor restaurante de frutos do mar de Mongaguá! Atendimento impecável e comida fresquíssima.</p>
+        </div>
+        <div class="feedback-item">
+          <div class="feedback-header">
+            <div class="feedback-author"><div class="feedback-avatar">MA</div><div><div class="feedback-name">Marcos Alves</div><div class="feedback-date">Torneio de Surf · 2 semanas</div></div></div>
+            <div class="feedback-stars">★★★★☆</div>
+          </div>
+          <p class="feedback-text">Torneio muito bem organizado. As ondas estavam perfeitas! Só faltou um pouco mais de estrutura para os espectadores.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bottom-nav-item active" onclick="showPage('home')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Início
+    </button>
+    <button class="bottom-nav-item" onclick="showPage('eventos')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Eventos
+    </button>
+    <button class="bottom-nav-item" onclick="requireLogin('publicar')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Publicar
+    </button>
+    <button class="bottom-nav-item" onclick="showPage('favoritos')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Favoritos
+    </button>
+    <button class="bottom-nav-item" onclick="showPage('perfil-user')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Perfil
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL: OAUTH LOGIN -->
+<!-- ══════════════════════════════════════════ -->
+<div class="oauth-overlay" id="oauthOverlay">
+  <div class="oauth-modal" id="oauthModal">
+    <div class="oauth-header">
+      <div class="oauth-provider-icon" id="oauthProviderIcon"></div>
+      <div class="oauth-header-text">
+        <div class="oauth-header-title" id="oauthProviderTitle">Fazer login com Google</div>
+        <div class="oauth-header-sub">Escolha uma conta para continuar no ConectaMonga</div>
+      </div>
+    </div>
+    <div class="oauth-body">
+      <div class="oauth-account selected" id="oauthAccount1" onclick="selectOauthAccount(0)">
+        <div class="oauth-avatar" id="oauthAvatar1" style="background:linear-gradient(135deg,#4285F4,#34A853)">JS</div>
+        <div>
+          <div class="oauth-account-name" id="oauthName1">Julia Santos</div>
+          <div class="oauth-account-email" id="oauthEmail1">julia.santos@gmail.com</div>
+        </div>
+        <div class="oauth-check"></div>
+      </div>
+      <div class="oauth-account" id="oauthAccount2" onclick="selectOauthAccount(1)">
+        <div class="oauth-avatar" id="oauthAvatar2" style="background:linear-gradient(135deg,#EA4335,#FBBC05)">MA</div>
+        <div>
+          <div class="oauth-account-name" id="oauthName2">Marcos Alves</div>
+          <div class="oauth-account-email" id="oauthEmail2">m.alves@gmail.com</div>
+        </div>
+        <div class="oauth-check"></div>
+      </div>
+      <div class="oauth-divider">ou use outra conta</div>
+      <div class="oauth-new-account">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Adicionar conta
+      </div>
+    </div>
+    <div class="oauth-footer">
+      <button class="oauth-btn-cancel" onclick="fecharOauth()">Cancelar</button>
+      <button class="oauth-btn-confirm" id="oauthConfirmBtn" onclick="confirmarOauth()">
+        <span class="oauth-spinner" id="oauthSpinner"></span>
+        <span id="oauthBtnText">Continuar</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── ESTADO DE AUTENTICAÇÃO ───
+let usuarioLogado = null; // null = deslogado
+
+function isLogado() { return usuarioLogado !== null; }
+
+function requireLogin(page) {
+  if (isLogado()) {
+    showPage(page);
+  } else {
+    // Guarda a página de destino para redirecionar após login
+    sessionStorage.setItem('redirectAfterLogin', page);
+    showPage('login-user');
+    // Mostra mensagem informando que precisa logar
+    setTimeout(() => {
+      const msg = document.getElementById('loginMsg');
+      if (msg) {
+        msg.style.display = 'flex';
+        msg.textContent = '⚠️ Você precisa estar logado para publicar eventos.';
+      }
+    }, 100);
+  }
+}
+
+function fazerLogin(nome, tipo) {
+  usuarioLogado = { nome, tipo }; // tipo: 'usuario' ou 'empresa'
+  atualizarNavbar();
+  const redirect = sessionStorage.getItem('redirectAfterLogin');
+  sessionStorage.removeItem('redirectAfterLogin');
+  showPage(redirect || (tipo === 'empresa' ? 'perfil-empresa' : 'perfil-user'));
+}
+
+function fazerLogout() {
+  usuarioLogado = null;
+  atualizarNavbar();
+  showPage('home');
+}
+
+function atualizarNavbar() {
+  const guest = document.getElementById('navActions');
+  const logado = document.getElementById('navActionsLogado');
+  const nome = document.getElementById('navNomeUsuario');
+  const mobileGuest = document.getElementById('mobileGuestLinks');
+  const mobileUser = document.getElementById('mobileUserLinks');
+
+  if (isLogado()) {
+    guest.classList.add('hidden');
+    logado.classList.remove('hidden');
+    if (nome) nome.textContent = '👋 ' + usuarioLogado.nome.split(' ')[0];
+    if (mobileGuest) mobileGuest.style.display = 'none';
+    if (mobileUser) mobileUser.style.display = 'block';
+  } else {
+    guest.classList.remove('hidden');
+    logado.classList.add('hidden');
+    if (mobileGuest) mobileGuest.style.display = 'block';
+    if (mobileUser) mobileUser.style.display = 'none';
+  }
+}
+
+// ─── LOGIN SOCIAL (OAUTH SIMULADO) ───
+let oauthProvider = null;
+let oauthSelectedIdx = 0;
+
+const oauthUsers = {
+  google: [
+    { name: 'Julia Santos',  email: 'julia.santos@gmail.com',  initials: 'JS', avatarBg: 'linear-gradient(135deg,#4285F4,#34A853)' },
+    { name: 'Marcos Alves', email: 'm.alves@gmail.com',        initials: 'MA', avatarBg: 'linear-gradient(135deg,#EA4335,#FBBC05)' }
+  ],
+  facebook: [
+    { name: 'Julia Santos',  email: 'julia.santos@hotmail.com', initials: 'JS', avatarBg: 'linear-gradient(135deg,#1877F2,#42b0ff)' },
+    { name: 'Marcos Alves', email: 'm.alves@hotmail.com',       initials: 'MA', avatarBg: 'linear-gradient(135deg,#0e4da4,#1877F2)' }
+  ]
+};
+
+function loginSocial(provider) {
+  oauthProvider = provider;
+  oauthSelectedIdx = 0;
+
+  const users = oauthUsers[provider];
+  const isGoogle = provider === 'google';
+
+  // Atualiza ícone e título
+  document.getElementById('oauthProviderTitle').textContent =
+    'Fazer login com ' + (isGoogle ? 'Google' : 'Facebook');
+
+  document.getElementById('oauthProviderIcon').innerHTML = isGoogle
+    ? `<svg width="32" height="32" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`
+    : `<svg width="32" height="32" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`;
+
+  // Cor do botão confirmar
+  document.getElementById('oauthConfirmBtn').style.background = isGoogle
+    ? 'linear-gradient(135deg,#4285F4,#34A853)'
+    : 'linear-gradient(135deg,#1877F2,#42b0ff)';
+
+  // Preenche contas
+  users.forEach((u, i) => {
+    document.getElementById('oauthAvatar' + (i+1)).textContent = u.initials;
+    document.getElementById('oauthAvatar' + (i+1)).style.background = u.avatarBg;
+    document.getElementById('oauthName' + (i+1)).textContent = u.name;
+    document.getElementById('oauthEmail' + (i+1)).textContent = u.email;
+  });
+
+  // Reseta seleção
+  selectOauthAccount(0);
+  document.getElementById('oauthSpinner').style.display = 'none';
+  document.getElementById('oauthBtnText').textContent = 'Continuar';
+  document.getElementById('oauthConfirmBtn').disabled = false;
+
+  // Abre o modal
+  document.getElementById('oauthOverlay').classList.add('open');
+}
+
+function selectOauthAccount(idx) {
+  oauthSelectedIdx = idx;
+  [0, 1].forEach(i => {
+    document.getElementById('oauthAccount' + (i+1)).classList.toggle('selected', i === idx);
+  });
+}
+
+function fecharOauth() {
+  document.getElementById('oauthOverlay').classList.remove('open');
+}
+
+function confirmarOauth() {
+  const btn = document.getElementById('oauthConfirmBtn');
+  const spinner = document.getElementById('oauthSpinner');
+  const btnText = document.getElementById('oauthBtnText');
+
+  // Mostra loading
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnText.textContent = 'Conectando...';
+
+  // Simula delay de autenticação
+  setTimeout(() => {
+    const user = oauthUsers[oauthProvider][oauthSelectedIdx];
+    fecharOauth();
+    fazerLogin(user.name, 'usuario');
+  }, 1800);
+}
+
+// Fecha modal ao clicar no overlay
+document.getElementById('oauthOverlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharOauth();
+});
+
+// ─── BUSCA DE EVENTOS ───
+function filtrarEventos(termo) {
+  const grid = document.getElementById('eventsGrid');
+  const semResultados = document.getElementById('semResultados');
+  if (!grid) return;
+  const cards = grid.querySelectorAll('.event-card');
+  const q = termo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  let visiveis = 0;
+  cards.forEach(card => {
+    const texto = (card.dataset.search || card.textContent).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const visivel = !q || texto.includes(q);
+    card.style.display = visivel ? '' : 'none';
+    if (visivel) visiveis++;
+  });
+  if (semResultados) semResultados.style.display = visiveis === 0 ? 'block' : 'none';
+}
+
+function loginComEmail() {
+  const email = document.getElementById('loginEmail');
+  const senha = document.getElementById('loginSenha');
+  if (!email || !email.value.trim()) {
+    const msg = document.getElementById('loginMsg');
+    if (msg) { msg.style.display = 'flex'; msg.textContent = '⚠️ Por favor, preencha seu e-mail e senha.'; }
+    return;
+  }
+  // Simula login com o nome extraído do e-mail
+  const nome = email.value.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  fazerLogin(nome, 'usuario');
+}
+
+// ─── PAGE NAVIGATION ───
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) {
+    page.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Atualiza nav-link ativo
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    const activeLink = document.querySelector(`.nav-link[onclick*="'${id}'"]`);
+    if (activeLink) activeLink.classList.add('active');
+    initReveal();
+  }
+  // close mobile menu
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ─── MOBILE MENU ───
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ─── NAVBAR SCROLL ───
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ─── CAROUSEL ───
+let carouselPos = 0;
+function moveCarousel(dir) {
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+  const cards = track.querySelectorAll('.event-card');
+  const cardW = cards[0].offsetWidth + 24;
+  const maxPos = cards.length - Math.floor(track.parentElement.offsetWidth / cardW);
+  carouselPos = Math.max(0, Math.min(carouselPos + dir, maxPos));
+  track.style.transform = `translateX(-${carouselPos * cardW}px)`;
+}
+
+// ─── SCROLL REVEAL ───
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  els.forEach(el => obs.observe(el));
+}
+document.addEventListener('DOMContentLoaded', initReveal);
+
+// ─── ANIMATED STATS ───
+function animateCounters() {
+  document.querySelectorAll('[data-target]').forEach(el => {
+    const target = parseFloat(el.dataset.target);
+    const dec = target % 1 !== 0;
+    let current = 0;
+    const step = target / 60;
+    const interval = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = dec ? current.toFixed(1) : Math.round(current).toLocaleString('pt-BR');
+      if (current >= target) clearInterval(interval);
+    }, 16);
+  });
+}
+const statsObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { animateCounters(); statsObs.disconnect(); } });
+}, { threshold: 0.3 });
+const statsBar = document.querySelector('.stats-bar');
+if (statsBar) statsObs.observe(statsBar);
+
+// ─── COUNTDOWN ───
+function updateCountdown() {
+  const target = new Date('2025-06-22T18:00:00');
+  const now = new Date();
+  const diff = Math.max(0, target - now);
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  ['days','hours','mins','secs'].forEach((k, i) => {
+    const el = document.getElementById('cd-' + k);
+    if (el) el.textContent = [d, h, m, s][i].toString().padStart(2, '0');
+  });
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ─── CATEGORY PILLS ───
+function selectCat(el) {
+  document.querySelectorAll('#catPills .cat-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ─── STARS ───
+function setStar(n) {
+  document.querySelectorAll('#starSelector .star-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i < n);
+  });
+}
+
+// ─── FILTER CHIPS ───
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.closest('.filter-bar').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+
+// ─── BANNER PREVIEW ───
+function previewBanner(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById('previewImg').style.background = `url(${e.target.result}) center/cover no-repeat`;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// Init
+initReveal();
+atualizarNavbar();
+</script>
+</body>
+</html>
