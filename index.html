@@ -1214,7 +1214,7 @@ footer {
   .hero h1 { font-size: 2rem; }
   .publish-inner, .fav-inner, .feedback-inner { padding: 40px 20px; }
   .form-card { padding: 24px 20px; }
-}
+
 </style>
 </head>
 <body>
@@ -1656,13 +1656,13 @@ footer {
     </div>
     <div class="section" style="padding-top:48px">
       <div class="filter-bar">
-        <div class="chip active">Todos</div>
-        <div class="chip">🎉 Festas</div>
-        <div class="chip">🍽️ Gastronomia</div>
-        <div class="chip">🏄 Esportes</div>
-        <div class="chip">🎭 Cultura</div>
-        <div class="chip">🎵 Música</div>
-        <div class="chip">🌊 Praia</div>
+        <div class="chip active" onclick="filtrarCategoria(this,'')">Todos</div>
+        <div class="chip" onclick="filtrarCategoria(this,'Festa')">🎉 Festas</div>
+        <div class="chip" onclick="filtrarCategoria(this,'Gastronomi')">🍽️ Gastronomia</div>
+        <div class="chip" onclick="filtrarCategoria(this,'Esporte')">🏄 Esportes</div>
+        <div class="chip" onclick="filtrarCategoria(this,'Cultura')">🎭 Cultura</div>
+        <div class="chip" onclick="filtrarCategoria(this,'Música')">🎵 Música</div>
+        <div class="chip" onclick="filtrarCategoria(this,'Praia')">🌊 Praia</div>
       </div>
       <div class="events-grid" id="eventsGrid">
         <div class="event-card" data-search="festival gastronômico gastronomia praça central prefeitura" onclick="showPage('detalhe')">
@@ -1897,7 +1897,7 @@ footer {
             <label class="checkbox-label">
               <input type="checkbox"> Lembrar de mim
             </label>
-            <a class="link-small">Esqueci minha senha</a>
+            <a class="link-small" onclick="showPage('esqueci-senha')">Esqueci minha senha</a>
           </div>
           <button class="btn-submit" onclick="loginComEmail()">Entrar na conta</button>
           <div class="auth-footer-link">Não tem conta? <a onclick="showPage('cadastro-user')">Criar conta grátis</a></div>
@@ -2112,7 +2112,7 @@ footer {
           <div class="profile-sub">Moradora de Mongaguá · Membro desde Jan 2024</div>
         </div>
         <div style="margin-left:auto;padding-bottom:8px">
-          <button class="btn-ghost-nav">⚙️ Editar perfil</button>
+          <button class="btn-ghost-nav" onclick="abrirEditarPerfil()">⚙️ Editar perfil</button>
         </div>
       </div>
       <div class="profile-grid">
@@ -2520,7 +2520,7 @@ footer {
         <div class="oauth-check"></div>
       </div>
       <div class="oauth-divider">ou use outra conta</div>
-      <div class="oauth-new-account">
+      <div class="oauth-new-account" onclick="adicionarContaOauth()" style="cursor:pointer">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         Adicionar conta
       </div>
@@ -2830,9 +2830,284 @@ function previewBanner(event) {
   }
 }
 
+
+// ─── ESQUECI MINHA SENHA ───
+function enviarRedefinicaoSenha() {
+  const email = document.getElementById('esqueciEmail').value.trim();
+  const msg = document.getElementById('esqueciMsg');
+  if (!email || !email.includes('@')) {
+    msg.style.display = 'flex';
+    msg.style.background = '#fff3cd';
+    msg.style.border = '1px solid #ffc107';
+    msg.style.color = '#856404';
+    msg.textContent = '⚠️ Por favor, informe um e-mail válido.';
+    return;
+  }
+  msg.style.display = 'flex';
+  msg.style.background = '#d4edda';
+  msg.style.border = '1px solid #c3e6cb';
+  msg.style.color = '#155724';
+  msg.textContent = '✅ Link de redefinição enviado! Verifique sua caixa de entrada.';
+  document.getElementById('esqueciEmail').value = '';
+}
+
+// ─── EDITAR PERFIL ───
+function abrirEditarPerfil() {
+  const msg = document.getElementById('editarPerfilMsg');
+  msg.style.display = 'none';
+  // Preenche com dados atuais
+  if (usuarioLogado) {
+    document.getElementById('editarNome').value = usuarioLogado.nome || '';
+    const partes = (usuarioLogado.nome || 'JS').split(' ');
+    document.getElementById('editarAvatar').textContent = (partes[0][0] + (partes[1]?partes[1][0]:'')).toUpperCase();
+  }
+  document.getElementById('editarPerfilBtnText').textContent = 'Salvar alterações';
+  document.getElementById('editarPerfilSpinner').style.display = 'none';
+  document.getElementById('editarPerfilConfirmBtn').disabled = false;
+  document.getElementById('editarPerfilOverlay').classList.add('open');
+}
+
+function fecharEditarPerfil() {
+  document.getElementById('editarPerfilOverlay').classList.remove('open');
+}
+
+function alterarFoto(input) {
+  // Só simula — em produção usaria upload real
+  const partes = (usuarioLogado && usuarioLogado.nome || 'JS').split(' ');
+  const initials = (partes[0][0] + (partes[1]?partes[1][0]:'')).toUpperCase();
+  document.getElementById('editarAvatar').textContent = '📷';
+}
+
+function salvarPerfil() {
+  const nome = document.getElementById('editarNome').value.trim();
+  const btn = document.getElementById('editarPerfilConfirmBtn');
+  const spinner = document.getElementById('editarPerfilSpinner');
+  const btnText = document.getElementById('editarPerfilBtnText');
+  const msg = document.getElementById('editarPerfilMsg');
+
+  if (!nome) {
+    msg.style.display = 'block';
+    msg.style.background = '#fff3cd';
+    msg.style.border = '1px solid #ffc107';
+    msg.style.color = '#856404';
+    msg.textContent = '⚠️ O nome não pode estar vazio.';
+    return;
+  }
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnText.textContent = 'Salvando...';
+
+  setTimeout(() => {
+    if (usuarioLogado) {
+      usuarioLogado.nome = nome;
+      atualizarNavbar();
+      // Atualiza nome no perfil
+      const profileName = document.querySelector('.profile-name');
+      if (profileName) profileName.textContent = nome;
+      const partes = nome.split(' ');
+      const initials = (partes[0][0] + (partes[1]?partes[1][0]:'')).toUpperCase();
+      const profileAvatar = document.querySelector('.profile-avatar');
+      if (profileAvatar) profileAvatar.textContent = initials;
+    }
+    msg.style.display = 'block';
+    msg.style.background = '#d4edda';
+    msg.style.border = '1px solid #c3e6cb';
+    msg.style.color = '#155724';
+    msg.textContent = '✅ Perfil atualizado com sucesso!';
+    btn.disabled = false;
+    spinner.style.display = 'none';
+    btnText.textContent = 'Salvar alterações';
+    setTimeout(() => fecharEditarPerfil(), 1200);
+  }, 1200);
+}
+
+document.getElementById('editarPerfilOverlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharEditarPerfil();
+});
+
+// ─── ADICIONAR CONTA (no modal OAuth) ───
+function adicionarContaOauth() {
+  fecharOauth();
+  setTimeout(() => {
+    document.getElementById('adicionarContaOverlay').classList.add('open');
+  }, 200);
+}
+
+function fecharAdicionarConta() {
+  document.getElementById('adicionarContaOverlay').classList.remove('open');
+}
+
+function adicionarContaComGoogle() {
+  fecharAdicionarConta();
+  setTimeout(() => loginSocial('google'), 200);
+}
+
+function adicionarContaComFacebook() {
+  fecharAdicionarConta();
+  setTimeout(() => loginSocial('facebook'), 200);
+}
+
+function confirmarAdicionarConta() {
+  const email = document.getElementById('adicionarEmail').value.trim();
+  if (!email || !email.includes('@')) return;
+  const nome = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  fecharAdicionarConta();
+  setTimeout(() => fazerLogin(nome, 'usuario'), 200);
+}
+
+document.getElementById('adicionarContaOverlay').addEventListener('click', function(e) {
+  if (e.target === this) fecharAdicionarConta();
+});
+
+// ─── FILTRAR POR CATEGORIA ───
+function filtrarCategoria(el, cat) {
+  // Atualiza chip ativo
+  el.closest('.filter-bar').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+
+  const grid = document.getElementById('eventsGrid');
+  const semResultados = document.getElementById('semResultados');
+  if (!grid) return;
+
+  const cards = grid.querySelectorAll('.event-card');
+  let visiveis = 0;
+  cards.forEach(card => {
+    const badge = card.querySelector('.event-cat-badge');
+    const catCard = badge ? badge.textContent.trim() : '';
+    const search = (card.dataset.search || card.textContent).toLowerCase();
+    const catLower = cat.toLowerCase();
+    const visivel = !cat || catCard.toLowerCase().includes(catLower) || search.includes(catLower);
+    card.style.display = visivel ? '' : 'none';
+    if (visivel) visiveis++;
+  });
+  if (semResultados) semResultados.style.display = visiveis === 0 ? 'block' : 'none';
+}
+
 // Init
 initReveal();
 atualizarNavbar();
 </script>
-</body>
+<!-- ══════════════════════════════════════════ -->
+<!-- PAGE: ESQUECI MINHA SENHA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="page" id="page-esqueci-senha">
+  <div class="auth-page">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-top">
+          <div class="auth-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h2>Esqueci minha senha</h2>
+          <p>Informe seu e-mail e enviaremos um link para redefinir sua senha</p>
+        </div>
+        <div class="auth-body">
+          <div id="esqueciMsg" style="display:none;border-radius:var(--radius-sm);padding:12px 16px;font-size:0.85rem;font-weight:600;margin-bottom:16px;align-items:center;gap:8px"></div>
+          <div class="form-group">
+            <label class="form-label">E-mail cadastrado <span class="req">*</span></label>
+            <input type="email" id="esqueciEmail" class="form-input" placeholder="seu@email.com">
+          </div>
+          <button class="btn-submit" onclick="enviarRedefinicaoSenha()">📧 Enviar link de redefinição</button>
+          <div class="auth-footer-link" style="margin-top:16px">
+            <a onclick="showPage('login-user')" style="cursor:pointer;color:var(--g700);font-weight:600">← Voltar ao login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL: EDITAR PERFIL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="oauth-overlay" id="editarPerfilOverlay">
+  <div class="oauth-modal" style="max-width:480px">
+    <div class="oauth-header">
+      <div class="oauth-provider-icon" style="background:var(--g50)">
+        <svg width="24" height="24" fill="none" stroke="var(--g700)" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="oauth-header-text">
+        <div class="oauth-header-title">Editar perfil</div>
+        <div class="oauth-header-sub">Atualize suas informações pessoais</div>
+      </div>
+      <button onclick="fecharEditarPerfil()" style="background:none;border:none;cursor:pointer;color:var(--ink4);font-size:1.2rem;padding:4px;line-height:1">✕</button>
+    </div>
+    <div class="oauth-body">
+      <div id="editarPerfilMsg" style="display:none;background:#d4edda;border:1px solid #c3e6cb;border-radius:var(--radius-sm);padding:12px 16px;font-size:0.85rem;font-weight:600;color:#155724;margin-bottom:16px"></div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--g900),var(--g500));display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:white;flex-shrink:0" id="editarAvatar">JS</div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;color:var(--ink);margin-bottom:4px">Foto de perfil</div>
+          <button onclick="document.getElementById('fotoInput').click()" style="background:var(--g50);border:1.5px solid var(--g300);color:var(--g700);font-size:0.8rem;font-weight:600;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;font-family:'DM Sans',sans-serif">Alterar foto</button>
+          <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="alterarFoto(this)">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label">Nome completo</label>
+        <input type="text" id="editarNome" class="form-input" placeholder="Seu nome completo">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label">E-mail</label>
+        <input type="email" id="editarEmailPerfil" class="form-input" placeholder="seu@email.com">
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label class="form-label">Cidade</label>
+        <input type="text" id="editarCidade" class="form-input" placeholder="Ex: Mongaguá-SP" value="Mongaguá-SP">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Nova senha (opcional)</label>
+        <input type="password" id="editarSenha" class="form-input" placeholder="Deixe em branco para manter">
+      </div>
+    </div>
+    <div class="oauth-footer">
+      <button class="oauth-btn-cancel" onclick="fecharEditarPerfil()">Cancelar</button>
+      <button class="oauth-btn-confirm" id="editarPerfilConfirmBtn" onclick="salvarPerfil()" style="background:linear-gradient(135deg,var(--g900),var(--g700))">
+        <span class="oauth-spinner" id="editarPerfilSpinner"></span>
+        <span id="editarPerfilBtnText">Salvar alterações</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL: ADICIONAR CONTA -->
+<!-- ══════════════════════════════════════════ -->
+<div class="oauth-overlay" id="adicionarContaOverlay">
+  <div class="oauth-modal" style="max-width:400px">
+    <div class="oauth-header">
+      <div class="oauth-provider-icon" style="background:var(--g50)">
+        <svg width="24" height="24" fill="none" stroke="var(--g700)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </div>
+      <div class="oauth-header-text">
+        <div class="oauth-header-title">Adicionar conta</div>
+        <div class="oauth-header-sub">Entre com outra conta para continuar</div>
+      </div>
+      <button onclick="fecharAdicionarConta()" style="background:none;border:none;cursor:pointer;color:var(--ink4);font-size:1.2rem;padding:4px;line-height:1">✕</button>
+    </div>
+    <div class="oauth-body">
+      <button class="social-btn" onclick="adicionarContaComGoogle()" style="margin-bottom:10px">
+        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Adicionar conta Google
+      </button>
+      <button class="social-btn" onclick="adicionarContaComFacebook()" style="margin-bottom:0">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Adicionar conta Facebook
+      </button>
+      <div class="divider"><span>ou entre com e-mail</span></div>
+      <div class="form-group" style="margin-bottom:12px">
+        <input type="email" id="adicionarEmail" class="form-input" placeholder="novo@email.com">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <input type="password" id="adicionarSenha" class="form-input" placeholder="Senha">
+      </div>
+    </div>
+    <div class="oauth-footer">
+      <button class="oauth-btn-cancel" onclick="fecharAdicionarConta()">Cancelar</button>
+      <button class="oauth-btn-confirm" onclick="confirmarAdicionarConta()" style="background:linear-gradient(135deg,var(--g900),var(--g700))">Entrar</button>
+    </div>
+  </div>
+</div>
+
+
 </html>
